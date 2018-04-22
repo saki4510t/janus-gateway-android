@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -197,77 +198,75 @@ public class ConnectActivity extends BaseActivity {
 		}
 	};
 	
-	private void connectToRoom(final String _roomId) {
+	private void connectToRoom(@Nullable final String roomId) {
 		
+		if (TextUtils.isEmpty(roomId)) return;
 		if (!checkPermissionNetwork()) return;
 		if (!checkPermissionAudio()) return;
 		if (!checkPermissionCamera()) return;
 		
-		String roomId = _roomId;
-		// roomId is random for loopback.
-		
-		String roomUrl = sharedPref.getString(
+		final String roomUrl = sharedPref.getString(
 			keyprefRoomServerUrl, getString(R.string.pref_room_server_url_default));
 		
 		// Video call enabled flag.
-		boolean videoCallEnabled = sharedPrefGetBoolean(sharedPref,
+		final boolean videoCallEnabled = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_videocall_key, R.string.pref_videocall_default);
 		
 		// Use screencapture option.
-		boolean useScreencapture = sharedPrefGetBoolean(sharedPref,
+		final boolean useScreencapture = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_screencapture_key, R.string.pref_screencapture_default);
 		
 		// Use Camera2 option.
-		boolean useCamera2 = sharedPrefGetBoolean(sharedPref,
+		final boolean useCamera2 = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_camera2_key, R.string.pref_camera2_default);
 		
 		// Get default codecs.
-		String videoCodec = sharedPrefGetString(sharedPref,
+		final String videoCodec = sharedPrefGetString(sharedPref,
 			R.string.pref_videocodec_key, R.string.pref_videocodec_default);
-		String audioCodec = sharedPrefGetString(sharedPref,
+		final String audioCodec = sharedPrefGetString(sharedPref,
 			R.string.pref_audiocodec_key, R.string.pref_audiocodec_default);
 		
 		// Check HW codec flag.
-		boolean hwCodec = sharedPrefGetBoolean(sharedPref,
+		final boolean hwCodec = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_hwcodec_key, R.string.pref_hwcodec_default);
 		
 		// Check Capture to texture.
-		boolean captureToTexture = sharedPrefGetBoolean(sharedPref,
+		final boolean captureToTexture = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_capturetotexture_key, R.string.pref_capturetotexture_default);
 		
 		// Check FlexFEC.
-		boolean flexfecEnabled = sharedPrefGetBoolean(sharedPref,
+		final boolean flexfecEnabled = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_flexfec_key, R.string.pref_flexfec_default);
 		
 		// Check Disable Audio Processing flag.
-		boolean noAudioProcessing = sharedPrefGetBoolean(sharedPref,
+		final boolean noAudioProcessing = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_noaudioprocessing_key, R.string.pref_noaudioprocessing_default);
 		
-		boolean aecDump = sharedPrefGetBoolean(sharedPref,
+		final boolean aecDump = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_aecdump_key, R.string.pref_aecdump_default);
 		
-		boolean saveInputAudioToFile = sharedPrefGetBoolean(sharedPref,
+		final boolean saveInputAudioToFile = sharedPrefGetBoolean(sharedPref,
 				R.string.pref_enable_save_input_audio_to_file_key,
 				R.string.pref_enable_save_input_audio_to_file_default);
 		
 		// Check OpenSL ES enabled flag.
-		boolean useOpenSLES = sharedPrefGetBoolean(sharedPref,
+		final boolean useOpenSLES = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_opensles_key, R.string.pref_opensles_default);
 		
 		// Check Disable built-in AEC flag.
-		boolean disableBuiltInAEC = sharedPrefGetBoolean(sharedPref,
+		final boolean disableBuiltInAEC = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_disable_built_in_aec_key, R.string.pref_disable_built_in_aec_default);
 		
 		// Check Disable built-in AGC flag.
-		boolean disableBuiltInAGC = sharedPrefGetBoolean(sharedPref,
+		final boolean disableBuiltInAGC = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_disable_built_in_agc_key, R.string.pref_disable_built_in_agc_default);
 		
 		// Check Disable built-in NS flag.
-		boolean disableBuiltInNS = sharedPrefGetBoolean(sharedPref,
+		final boolean disableBuiltInNS = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_disable_built_in_ns_key, R.string.pref_disable_built_in_ns_default);
 		
 		// Check Disable gain control
-		boolean disableWebRtcAGCAndHPF = sharedPrefGetBoolean(sharedPref,
+		final boolean disableWebRtcAGCAndHPF = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_disable_webrtc_agc_and_hpf_key, R.string.pref_disable_webrtc_agc_and_hpf_key);
 		
 		// Get video resolution from settings.
@@ -291,8 +290,8 @@ public class ConnectActivity extends BaseActivity {
 		
 		// Get camera fps from settings.
 		int cameraFps = 0;
-		String fps = sharedPref.getString(keyprefFps, getString(R.string.pref_fps_default));
-		String[] fpsValues = fps.split("[ x]+");
+		final String fps = sharedPref.getString(keyprefFps, getString(R.string.pref_fps_default));
+		final String[] fpsValues = fps.split("[ x]+");
 		if (fpsValues.length == 2) {
 			try {
 				cameraFps = Integer.parseInt(fpsValues[0]);
@@ -303,16 +302,16 @@ public class ConnectActivity extends BaseActivity {
 		}
 		
 		// Check capture quality slider flag.
-		boolean captureQualitySlider = sharedPrefGetBoolean(sharedPref,
+		final boolean captureQualitySlider = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_capturequalityslider_key, R.string.pref_capturequalityslider_default);
 		
 		// Get video and audio start bitrate.
 		int videoStartBitrate = 0;
 		{
-			String bitrateTypeDefault = getString(R.string.pref_maxvideobitrate_default);
-			String bitrateType = sharedPref.getString(keyprefVideoBitrateType, bitrateTypeDefault);
+			final String bitrateTypeDefault = getString(R.string.pref_maxvideobitrate_default);
+			final String bitrateType = sharedPref.getString(keyprefVideoBitrateType, bitrateTypeDefault);
 			if (!bitrateType.equals(bitrateTypeDefault)) {
-				String bitrateValue = sharedPref.getString(
+				final String bitrateValue = sharedPref.getString(
 					keyprefVideoBitrateValue, getString(R.string.pref_maxvideobitratevalue_default));
 				videoStartBitrate = Integer.parseInt(bitrateValue);
 			}
@@ -320,50 +319,50 @@ public class ConnectActivity extends BaseActivity {
 		
 		int audioStartBitrate = 0;
 		{
-			String bitrateTypeDefault = getString(R.string.pref_startaudiobitrate_default);
-			String bitrateType = sharedPref.getString(keyprefAudioBitrateType, bitrateTypeDefault);
+			final String bitrateTypeDefault = getString(R.string.pref_startaudiobitrate_default);
+			final String bitrateType = sharedPref.getString(keyprefAudioBitrateType, bitrateTypeDefault);
 			if (!bitrateType.equals(bitrateTypeDefault)) {
-				String bitrateValue = sharedPref.getString(
+				final String bitrateValue = sharedPref.getString(
 					keyprefAudioBitrateValue, getString(R.string.pref_startaudiobitratevalue_default));
 				audioStartBitrate = Integer.parseInt(bitrateValue);
 			}
 		}
 		
 		// Check statistics display option.
-		boolean displayHud = sharedPrefGetBoolean(sharedPref,
+		final boolean displayHud = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_displayhud_key, R.string.pref_displayhud_default);
 		
-		boolean tracing = sharedPrefGetBoolean(sharedPref,
+		final boolean tracing = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_tracing_key, R.string.pref_tracing_default);
 		
 		// Check Enable org.appspot.apprtc.RtcEventLog.
-		boolean rtcEventLogEnabled = sharedPrefGetBoolean(sharedPref,
+		final boolean rtcEventLogEnabled = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_enable_rtceventlog_key, R.string.pref_enable_rtceventlog_default);
 		
-		boolean useLegacyAudioDevice = sharedPrefGetBoolean(sharedPref,
+		final boolean useLegacyAudioDevice = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_use_legacy_audio_device_key, R.string.pref_use_legacy_audio_device_default);
 		
 		// Get datachannel options
-		boolean dataChannelEnabled = sharedPrefGetBoolean(sharedPref,
+		final boolean dataChannelEnabled = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_enable_datachannel_key, R.string.pref_enable_datachannel_default);
-		boolean ordered = sharedPrefGetBoolean(sharedPref,
+		final boolean ordered = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_ordered_key, R.string.pref_ordered_default);
-		boolean negotiated = sharedPrefGetBoolean(sharedPref,
+		final boolean negotiated = sharedPrefGetBoolean(sharedPref,
 			R.string.pref_negotiated_key, R.string.pref_negotiated_default);
-		int maxRetrMs = sharedPrefGetInteger(sharedPref,
+		final int maxRetrMs = sharedPrefGetInteger(sharedPref,
 			R.string.pref_max_retransmit_time_ms_key, R.string.pref_max_retransmit_time_ms_default);
-		int maxRetr = sharedPrefGetInteger(sharedPref,
+		final int maxRetr = sharedPrefGetInteger(sharedPref,
 			R.string.pref_max_retransmits_key, R.string.pref_max_retransmits_default);
-		int id = sharedPrefGetInteger(sharedPref,
+		final int id = sharedPrefGetInteger(sharedPref,
 			R.string.pref_data_id_key, R.string.pref_data_id_default);
-		String protocol = sharedPrefGetString(sharedPref,
+		final String protocol = sharedPrefGetString(sharedPref,
 			R.string.pref_data_protocol_key, R.string.pref_data_protocol_default);
 		
 		// Start AppRTCMobile activity.
 		Log.d(TAG, "Connecting to room " + roomId + " at URL " + roomUrl);
 		if (validateUrl(roomUrl)) {
-			Uri uri = Uri.parse(roomUrl);
-			Intent intent = new Intent(this, JanusActivity.class);
+			final Uri uri = Uri.parse(roomUrl);
+			final Intent intent = new Intent(this, JanusActivity.class);
 			intent.setData(uri);
 			intent.putExtra(EXTRA_ROOMID, roomId);
 			intent.putExtra(EXTRA_LOOPBACK, false);
@@ -406,25 +405,25 @@ public class ConnectActivity extends BaseActivity {
 			}
 			
 			if (getIntent().hasExtra(EXTRA_VIDEO_FILE_AS_CAMERA)) {
-				String videoFileAsCamera =
+				final String videoFileAsCamera =
 					getIntent().getStringExtra(EXTRA_VIDEO_FILE_AS_CAMERA);
 				intent.putExtra(EXTRA_VIDEO_FILE_AS_CAMERA, videoFileAsCamera);
 			}
 			
 			if (getIntent().hasExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE)) {
-				String saveRemoteVideoToFile =
+				final String saveRemoteVideoToFile =
 					getIntent().getStringExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE);
 				intent.putExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE, saveRemoteVideoToFile);
 			}
 			
 			if (getIntent().hasExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_WIDTH)) {
-				int videoOutWidth =
+				final int videoOutWidth =
 					getIntent().getIntExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_WIDTH, 0);
 				intent.putExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_WIDTH, videoOutWidth);
 			}
 			
 			if (getIntent().hasExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_HEIGHT)) {
-				int videoOutHeight =
+				final int videoOutHeight =
 					getIntent().getIntExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_HEIGHT, 0);
 				intent.putExtra(EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_HEIGHT, videoOutHeight);
 			}
