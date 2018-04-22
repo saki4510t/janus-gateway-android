@@ -10,7 +10,7 @@ android {
 	}
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion versionTarget
    		versionCode appVersionCode
    		versionName appVersionName
@@ -44,5 +44,5 @@ dependencies {
 		exclude module: 'support-v4'
 	}
 
-    implementation project(':janusclientapi')
+	implementation project(':janusclientapi')
 }
