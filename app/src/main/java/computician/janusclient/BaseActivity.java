@@ -2,8 +2,11 @@ package computician.janusclient;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.serenegiant.dialog.MessageDialogFragment;
@@ -168,4 +171,55 @@ public abstract class BaseActivity extends Activity
 		}
 		return true;
 	}
+
+//================================================================================
+	/**
+	 * Get a value from the shared preference, if it does not
+	 * exist the default is used.
+	 * @param sharedPref
+	 * @param attributeId
+	 * @param defaultId
+	 */
+	private String sharedPrefGetString(final SharedPreferences sharedPref,
+		@StringRes final int attributeId, @StringRes final int defaultId) {
+
+		return sharedPref.getString(getString(attributeId), getString(defaultId));
+	}
+	
+	/**
+	 * Get a value from the shared preference, if it does not
+	 * exist the default is used.
+	 * @param sharedPref
+	 * @param attributeId
+	 * @param defaultId
+	 */
+	private boolean sharedPrefGetBoolean(final SharedPreferences sharedPref,
+		@StringRes final int attributeId, @StringRes final int defaultId) {
+
+		return sharedPref.getBoolean(getString(attributeId),
+			Boolean.parseBoolean(getString(defaultId)));
+	}
+	
+	/**
+	 * Get a value from the shared preference, if it does not
+	 * exist the default is used.
+	 * @param sharedPref
+	 * @param attributeId
+	 * @param defaultId
+	 */
+	private int sharedPrefGetInteger(final SharedPreferences sharedPref,
+		@StringRes final int attributeId, @StringRes final int defaultId) {
+
+		final String defaultString = getString(defaultId);
+		final int defaultValue = Integer.parseInt(defaultString);
+		final String attributeName = getString(attributeId);
+		final String value = sharedPref.getString(attributeName, defaultString);
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			Log.e(TAG, "Wrong setting for: " + attributeName + ":" + value);
+			return defaultValue;
+		}
+	}
+	
 }
