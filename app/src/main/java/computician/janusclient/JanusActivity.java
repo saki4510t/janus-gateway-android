@@ -20,6 +20,7 @@ public class JanusActivity extends BaseActivity {
 	private static final String TAG = JanusActivity.class.getSimpleName();
 
     private static final boolean AUTO_HIDE = true;
+	private static final int TEST = 1;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -40,8 +41,6 @@ public class JanusActivity extends BaseActivity {
 
     private VideoRenderer.Callbacks localRender;
     private VideoRenderer.Callbacks remoteRender;
-    private EchoTest echoTest;
-    private VideoRoomTest videoRoomTest;
 
     /**
      * The instance of the {@link SystemUiHider} for this activity.
@@ -58,9 +57,27 @@ public class JanusActivity extends BaseActivity {
         private void init() {
             try {
                 final EGLContext con = VideoRendererGui.getEGLContext();
-                echoTest = new EchoTest(localRender, remoteRender);
-                echoTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
-                echoTest.Start();
+                switch (TEST) {
+				case 0:
+				{
+					final EchoTest echoTest = new EchoTest(localRender, remoteRender);
+					echoTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
+					echoTest.Start();
+					break;
+				}
+				case 1:
+				{
+					final VideoRenderer.Callbacks[] renderers = new VideoRenderer.Callbacks[1];
+					renderers[0] = remoteRender;
+					final VideoRoomTest videoRoomTest = new VideoRoomTest(localRender, renderers);
+					videoRoomTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
+					videoRoomTest.Start();
+					break;
+				}
+				default:
+					throw new IllegalArgumentException("unsupported test index " + TEST);
+				
+				}
 
             } catch (final Exception ex) {
                 Log.w(TAG, ex);

@@ -76,8 +76,8 @@ public class VideoRoomTest {
             listener_handle = handle;
             try
             {
-                JSONObject body = new JSONObject();
-                JSONObject msg = new JSONObject();
+                final JSONObject body = new JSONObject();
+                final JSONObject msg = new JSONObject();
                 body.put(REQUEST, "join");
                 body.put("room", roomid);
                 body.put("ptype", "listener");
