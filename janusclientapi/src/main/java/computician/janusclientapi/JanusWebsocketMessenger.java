@@ -1,10 +1,9 @@
 package computician.janusclientapi;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigInteger;
 
 import com.koushikdutta.async.ByteBufferList;
@@ -26,12 +25,18 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
 	private static final boolean DEBUG = true;	// set false on  production
 	private static final String TAG = JanusWebsocketMessenger.class.getSimpleName();
  
+	private static final JanusMessengerType type = JanusMessengerType.websocket;
+
+ 	@NonNull
     private final String uri;
+    @NonNull
     private final IJanusMessageObserver handler;
-    private final JanusMessengerType type = JanusMessengerType.websocket;
+    @Nullable
     private WebSocket client = null;
 
-    public JanusWebsocketMessenger(String uri, IJanusMessageObserver handler) {
+    public JanusWebsocketMessenger(@NonNull final String uri,
+    	@NonNull final  IJanusMessageObserver handler) {
+
         this.uri = uri;
         this.handler = handler;
     }
@@ -43,9 +48,14 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
 
     @Override
     public void connect() {
-        AsyncHttpClient.getDefaultInstance().websocket(uri, "janus-protocol", new AsyncHttpClient.WebSocketConnectCallback() {
+		if (DEBUG) Log.v(TAG, "connect:");
+
+        AsyncHttpClient.getDefaultInstance().websocket(uri, "janus-protocol",
+        	new AsyncHttpClient.WebSocketConnectCallback() {
+
             @Override
             public void onCompleted(@Nullable final Exception ex, @Nullable final WebSocket webSocket) {
+            	if (DEBUG) Log.v(TAG, "onCompleted:webSocket=" + webSocket);
                 if (ex != null) {
                     handler.onError(ex);
                     return;
@@ -58,28 +68,28 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
                 client.setWriteableCallback(new WritableCallback() {
                     @Override
                     public void onWriteable() {
-                        Log.d("JANUSCLIENT", "On writable");
+                        Log.d(TAG, "On writable");
                     }
                 });
                 client.setPongCallback(new WebSocket.PongCallback() {
 
                     @Override
                     public void onPongReceived(String s) {
-                        Log.d("JANUSCLIENT", "Pong callback");
+                        Log.d(TAG, "Pong callback");
                     }
                 });
                 client.setDataCallback(new DataCallback() {
 
                     @Override
                     public void onDataAvailable(DataEmitter emitter, ByteBufferList bb) {
-                        Log.d("JANUSCLIENT", "New Data");
+                        Log.d(TAG, "New Data");
                     }
                 });
                 client.setEndCallback(new CompletedCallback() {
 
                     @Override
                     public void onCompleted(Exception ex) {
-                        Log.d("JANUSCLIENT", "Client End");
+                        Log.d(TAG, "Client End");
                     }
                 });
                 client.setStringCallback(new WebSocket.StringCallback() {
@@ -91,14 +101,9 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
                 client.setClosedCallback(new CompletedCallback() {
                     @Override
                     public void onCompleted(Exception ex) {
-                        Log.d("JANUSCLIENT", "Socket closed for some reason");
+                        Log.d(TAG, "Socket closed for some reason");
                         if (ex != null) {
-                            Log.d("JANUSCLIENT", "SOCKET EX " + ex.getMessage());
-                            StringWriter writer = new StringWriter();
-                            PrintWriter printWriter = new PrintWriter( writer );
-                            ex.printStackTrace( printWriter );
-                            printWriter.flush();
-                            Log.d("JANUSCLIENT", "StackTrace \n\t" + writer.toString());
+							Log.w(TAG, ex);
                         }
                         if (ex != null) {
                             onError(ex);
@@ -115,27 +120,37 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
 
     @Override
     public void disconnect() {
-        client.close();
+    	if (DEBUG) Log.v(TAG, "disconnect:");
+    	if (client != null) {
+        	client.close();
+		} else {
+			throw new IllegalStateException("WebSocket is null");
+		}
     }
 
     @Override
-    public void sendMessage(String message) {
-        Log.d("JANUSCLIENT", "Sent: \n\t" + message);
-        client.send(message);
+    public void sendMessage(@NonNull String message) {
+        Log.d(TAG, "Sent: \n\t" + message);
+		if (client != null) {
+	        client.send(message);
+		} else {
+			throw new IllegalStateException("WebSocket is null");
+		}
     }
 
     @Override
-    public void sendMessage(String message, BigInteger session_id) {
+    public void sendMessage(@NonNull final  String message, BigInteger session_id) {
         sendMessage(message);
     }
 
     @Override
-    public void sendMessage(String message, BigInteger session_id, BigInteger handle_id) {
+    public void sendMessage(@NonNull final  String message, BigInteger session_id, BigInteger handle_id) {
         sendMessage(message);
     }
 
     @Override
-    public void receivedMessage(String msg) {
+    public void receivedMessage(@NonNull final  String msg) {
+		if (DEBUG) Log.v(TAG, "receivedMessage:" + msg);
         try {
             JSONObject obj = new JSONObject(msg);
             handler.receivedNewMessage(obj);
@@ -144,16 +159,18 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
         }
     }
 
-    private void onMessage(String message) {
-        Log.d("JANUSCLIENT", "Recv: \n\t" + message);
+    private void onMessage(final String message) {
+        if (DEBUG) Log.d(TAG, "Recv: \n\t" + message);
         receivedMessage(message);
     }
 
-    private void onClose(int code, String reason, boolean remote) {
+    private void onClose(final int code, final String reason, final boolean remote) {
+		if (DEBUG) Log.v(TAG, "onClose:");
         handler.onClose();
     }
 
-    private void onError(Exception ex) {
+    private void onError(@NonNull final  Exception ex) {
+		if (DEBUG) Log.v(TAG, "onError:" + ex);
         handler.onError(ex);
     }
 

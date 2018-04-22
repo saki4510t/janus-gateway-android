@@ -2,6 +2,7 @@ package computician.janusclient;
 
 import android.content.Context;
 import android.opengl.EGLContext;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -69,6 +70,7 @@ public class VideoRoomTest {
         }
 
         public void success(JanusPluginHandle handle) {
+        	if (DEBUG) Log.v(TAG, "success:");
             listener_handle = handle;
             try
             {
@@ -89,17 +91,18 @@ public class VideoRoomTest {
 
         @Override
         public void onMessage(JSONObject msg, JSONObject jsep) {
+			if (DEBUG) Log.v(TAG, "onMessage:" + msg);
 
             try {
-                String event = msg.getString("videoroom");
+                final String event = msg.getString("videoroom");
                 if (event.equals("attached") && jsep != null) {
                     final JSONObject remoteJsep = jsep;
                     listener_handle.createAnswer(new IPluginHandleWebRTCCallbacks() {
                         @Override
                         public void onSuccess(JSONObject obj) {
                             try {
-                                JSONObject mymsg = new JSONObject();
-                                JSONObject body = new JSONObject();
+                                final JSONObject mymsg = new JSONObject();
+                                final JSONObject body = new JSONObject();
                                 body.put(REQUEST, "start");
                                 body.put("room", roomid);
                                 mymsg.put(MESSAGE, body);
@@ -117,7 +120,7 @@ public class VideoRoomTest {
 
                         @Override
                         public JanusMediaConstraints getMedia() {
-                            JanusMediaConstraints cons = new JanusMediaConstraints();
+                            final JanusMediaConstraints cons = new JanusMediaConstraints();
                             cons.setVideo(null);
                             cons.setRecvAudio(true);
                             cons.setRecvVideo(true);
@@ -145,42 +148,44 @@ public class VideoRoomTest {
 
         @Override
         public void onLocalStream(MediaStream stream) {
-
+			if (DEBUG) Log.v(TAG, "onLocalStream:" + stream);
         }
 
         @Override
         public void onRemoteStream(MediaStream stream) {
+			if (DEBUG) Log.v(TAG, "onRemoteStream:" + stream);
             stream.videoTracks.get(0).addRenderer(new VideoRenderer(renderer));
         }
 
         @Override
         public void onDataOpen(Object data) {
-
+			if (DEBUG) Log.v(TAG, "onDataOpen:" + data);
         }
 
         @Override
         public void onData(Object data) {
-
+			if (DEBUG) Log.v(TAG, "onData:" + data);
         }
 
         @Override
         public void onCleanup() {
-
+			if (DEBUG) Log.v(TAG, "onCleanup:");
         }
 
         @Override
         public void onDetached() {
-
+			if (DEBUG) Log.v(TAG, "onDetached:");
         }
 
         @Override
         public JanusSupportedPluginPackages getPlugin() {
+			if (DEBUG) Log.v(TAG, "getPlugin:");
             return JanusSupportedPluginPackages.JANUS_VIDEO_ROOM;
         }
 
         @Override
         public void onCallbackError(String error) {
-
+			Log.v(TAG, "onCallbackError:" + error);
         }
     }
 
@@ -193,8 +198,8 @@ public class VideoRoomTest {
                     public void onSuccess(JSONObject obj) {
                         try
                         {
-                            JSONObject msg = new JSONObject();
-                            JSONObject body = new JSONObject();
+                            final JSONObject msg = new JSONObject();
+                            final JSONObject body = new JSONObject();
                             body.put(REQUEST, "configure");
                             body.put("audio", true);
                             body.put("video", true);
@@ -213,7 +218,7 @@ public class VideoRoomTest {
 
                     @Override
                     public JanusMediaConstraints getMedia() {
-                        JanusMediaConstraints cons = new JanusMediaConstraints();
+                        final JanusMediaConstraints cons = new JanusMediaConstraints();
                         cons.setRecvAudio(false);
                         cons.setRecvVideo(false);
                         cons.setSendAudio(true);
@@ -235,8 +240,8 @@ public class VideoRoomTest {
 
         private void registerUsername() {
             if(handle != null) {
-                JSONObject obj = new JSONObject();
-                JSONObject msg = new JSONObject();
+                final JSONObject obj = new JSONObject();
+                final JSONObject msg = new JSONObject();
                 try
                 {
                     obj.put(REQUEST, "join");
@@ -278,7 +283,7 @@ public class VideoRoomTest {
         public void onMessage(JSONObject msg, JSONObject jsepLocal) {
             try
             {
-                String event = msg.getString("videoroom");
+                final String event = msg.getString("videoroom");
                 if(event.equals("joined")) {
                     myid = new BigInteger(msg.getString("id"));
                     publishOwnFeed();
@@ -318,38 +323,40 @@ public class VideoRoomTest {
         }
 
         @Override
-        public void onLocalStream(MediaStream stream) {
+        public void onLocalStream(final MediaStream stream) {
+        	if (DEBUG) Log.v(TAG, "onLocalStream:" + stream);
             stream.videoTracks.get(0).addRenderer(new VideoRenderer(localRender));
         }
 
         @Override
-        public void onRemoteStream(MediaStream stream) {
-
+        public void onRemoteStream(final MediaStream stream) {
+			if (DEBUG) Log.v(TAG, "onRemoteStream:" + stream);
         }
 
         @Override
-        public void onDataOpen(Object data) {
-
+        public void onDataOpen(final Object data) {
+			if (DEBUG) Log.v(TAG, "onDataOpen:" + data);
         }
 
         @Override
-        public void onData(Object data) {
-
+        public void onData(final Object data) {
+			if (DEBUG) Log.v(TAG, "onData:" + data);
         }
 
         @Override
         public void onCleanup() {
-
+			if (DEBUG) Log.v(TAG, "onCleanup:");
         }
 
         @Override
         public JanusSupportedPluginPackages getPlugin() {
+			if (DEBUG) Log.v(TAG, "getPlugin:");
             return JanusSupportedPluginPackages.JANUS_VIDEO_ROOM;
         }
 
         @Override
-        public void onCallbackError(String error) {
-
+        public void onCallbackError(final String error) {
+			Log.w(TAG, error);
         }
 
         @Override
@@ -360,36 +367,42 @@ public class VideoRoomTest {
 
     public class JanusGlobalCallbacks implements IJanusGatewayCallbacks {
         public void onSuccess() {
+			if (DEBUG) Log.v(TAG, "onSuccess:");
             janusServer.Attach(new JanusPublisherPluginCallbacks());
         }
 
         @Override
         public void onDestroy() {
+			if (DEBUG) Log.v(TAG, "onDestroy:");
         }
 
         @Override
         public String getServerUri() {
+			if (DEBUG) Log.v(TAG, "getServerUri:");
             return JANUS_URI;
         }
 
         @Override
         public List<PeerConnection.IceServer> getIceServers() {
+			if (DEBUG) Log.v(TAG, "getIceServers:");
             return new ArrayList<PeerConnection.IceServer>();
         }
 
         @Override
         public Boolean getIpv6Support() {
+			if (DEBUG) Log.v(TAG, "getIpv6Support:");
             return Boolean.FALSE;
         }
 
         @Override
         public Integer getMaxPollEvents() {
+			if (DEBUG) Log.v(TAG, "getMaxPollEvents:");
             return 0;
         }
 
         @Override
-        public void onCallbackError(String error) {
-
+        public void onCallbackError(final String error) {
+			Log.w(TAG, error);
         }
     }
 

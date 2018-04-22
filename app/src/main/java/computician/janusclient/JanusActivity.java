@@ -62,8 +62,8 @@ public class JanusActivity extends BaseActivity {
                 echoTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
                 echoTest.Start();
 
-            } catch (Exception ex) {
-                Log.e("computician.janusclient", ex.getMessage());
+            } catch (final Exception ex) {
+                Log.w(TAG, ex);
             }
         }
     }
@@ -93,7 +93,7 @@ public class JanusActivity extends BaseActivity {
 
 		if (!checkPermissionNetwork()) return;
 		if (!checkPermissionAudio()) return;
-		if (!checkPermissionCamera()) return;
+		checkPermissionCamera();
 
 	}
 }

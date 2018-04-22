@@ -42,36 +42,42 @@ public class EchoTest {
 
         @Override
         public void onSuccess() {
+            if (DEBUG) Log.v(TAG, "onSuccess:");
             janusServer.Attach(new JanusPluginCallbacks());
         }
 
         @Override
         public void onDestroy() {
+            if (DEBUG) Log.v(TAG, "onDestroy:");
         }
 
         @Override
         public String getServerUri() {
+            if (DEBUG) Log.v(TAG, "getServerUri:");
             return JANUS_URI;
         }
 
         @Override
         public List<PeerConnection.IceServer> getIceServers() {
+            if (DEBUG) Log.v(TAG, "getIceServers:");
             return new ArrayList<PeerConnection.IceServer>();
         }
 
         @Override
         public Boolean getIpv6Support() {
+            if (DEBUG) Log.v(TAG, "getIpv6Support:");
             return Boolean.FALSE;
         }
 
         @Override
         public Integer getMaxPollEvents() {
+            if (DEBUG) Log.v(TAG, "getMaxPollEvents:");
             return 0;
         }
 
         @Override
-        public void onCallbackError(String error) {
-
+        public void onCallbackError(final String error) {
+            if (DEBUG) Log.v(TAG, "onCallbackError:" + error);
         }
     }
 
