@@ -27,6 +27,8 @@ import computician.janusclientapi.JanusSupportedPluginPackages;
 import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 import computician.janusclientapi.PluginHandleWebRTCCallbacks;
 
+import static computician.janusclient.Const.JANUS_URI;
+
 //TODO create message classes unique to this plugin
 /**
  * Created by ben.trent on 7/24/2015.
@@ -39,7 +41,6 @@ public class VideoRoomTest {
     public static final String REQUEST = "request";
     public static final String MESSAGE = "message";
     public static final String PUBLISHERS = "publishers";
-    private static final String JANUS_URI = "ws://192.168.1.197:8188";
     private static final String user_name = "android";
     private static final int roomid = 1234;
 

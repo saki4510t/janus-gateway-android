@@ -22,6 +22,8 @@ import computician.janusclientapi.JanusServer;
 import computician.janusclientapi.JanusSupportedPluginPackages;
 import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 
+import static computician.janusclient.Const.JANUS_URI;
+
 /**
  * Created by ben.trent on 7/24/2015.
  * Modified by t_saki t_saki@serenegiant.com on 2018
@@ -33,7 +35,6 @@ public class EchoTest {
     private static final boolean DEBUG = true;	// set false on  production
    	private static final String TAG = EchoTest.class.getSimpleName();
 
-    private static final String JANUS_URI = "ws://192.168.1.197:8188";
     private JanusPluginHandle handle = null;
     private final VideoRenderer.Callbacks localRender, remoteRender;
     private final JanusServer janusServer;
