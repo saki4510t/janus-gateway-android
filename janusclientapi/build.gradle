@@ -1,15 +1,21 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion versionCompiler
+   	buildToolsVersion versionBuildTool
+
+	compileOptions {
+		sourceCompatibility javaSourceCompatibility
+		targetCompatibility javaTargetCompatibility
+	}
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion versionTarget
+   		versionCode appVersionCode
+   		versionName appVersionName
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -25,12 +31,19 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 }
-repositories {
-    mavenCentral()
-}
+
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'io.pristine:libjingle:9127@aar'
-    compile 'com.koushikdutta.async:androidasync:2.+'
-    compile 'com.mcxiaoke.volley:library:1.0.15@aar'
+	api fileTree(dir: 'libs', include: ['*.jar'])
+
+	implementation("com.android.support:design:${supportLibVersion}") {
+		exclude module: 'support-v4'
+		exclude module: 'appcompat-v7'
+	}
+	implementation "com.android.support:support-v4:${supportLibVersion}"
+	implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+	implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+
+	api 'io.pristine:libjingle:9127@aar'
+	api 'com.koushikdutta.async:androidasync:2.+'
+	api 'com.mcxiaoke.volley:library:1.0.15@aar'
 }
