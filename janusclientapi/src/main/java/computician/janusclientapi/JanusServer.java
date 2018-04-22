@@ -71,8 +71,6 @@ public class JanusServer implements Runnable, IJanusMessageObserver, IJanusSessi
 
     public JanusServer(IJanusGatewayCallbacks gatewayCallbacks) {
         gatewayObserver = gatewayCallbacks;
-        java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-        java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
         serverUri = gatewayObserver.getServerUri();
         iceServers = gatewayObserver.getIceServers();
         ipv6Support = gatewayObserver.getIpv6Support();
