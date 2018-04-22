@@ -43,6 +43,10 @@ dependencies {
 	implementation "com.android.support:appcompat-v7:${supportLibVersion}"
 	implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 
+	implementation("com.serenegiant:common:${commonLibVersion}") {
+		exclude module: 'support-v4'
+	}
+
 	api 'io.pristine:libjingle:9127@aar'
 	api 'com.koushikdutta.async:androidasync:2.+'
 	api 'com.mcxiaoke.volley:library:1.0.15@aar'
