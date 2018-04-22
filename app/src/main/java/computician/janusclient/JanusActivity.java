@@ -38,7 +38,6 @@ public class JanusActivity extends BaseActivity {
      */
     private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
 
-    private GLSurfaceView vsv;
     private VideoRenderer.Callbacks localRender;
     private VideoRenderer.Callbacks remoteRender;
     private EchoTest echoTest;
@@ -51,13 +50,14 @@ public class JanusActivity extends BaseActivity {
 
     private class MyInit implements Runnable {
 
+		@Override
         public void run() {
             init();
         }
 
         private void init() {
             try {
-                EGLContext con = VideoRendererGui.getEGLContext();
+                final EGLContext con = VideoRendererGui.getEGLContext();
                 echoTest = new EchoTest(localRender, remoteRender);
                 echoTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
                 echoTest.Start();
@@ -76,7 +76,7 @@ public class JanusActivity extends BaseActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        vsv = findViewById(R.id.glview);
+		final GLSurfaceView vsv = findViewById(R.id.glview);
         vsv.setPreserveEGLContextOnPause(true);
         vsv.setKeepScreenOn(true);
         VideoRendererGui.setView(vsv, new MyInit());

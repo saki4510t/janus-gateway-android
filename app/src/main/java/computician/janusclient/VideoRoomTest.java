@@ -258,7 +258,7 @@ public class VideoRoomTest {
             }
         }
 
-        private void newRemoteFeed(BigInteger id) { //todo attach the plugin as a listener
+        private void newRemoteFeed(final BigInteger id) { //todo attach the plugin as a listener
             VideoRenderer.Callbacks myrenderer;
             if(!remoteRenderers.containsKey(id))
             {
@@ -274,13 +274,13 @@ public class VideoRoomTest {
         }
 
         @Override
-        public void success(JanusPluginHandle pluginHandle) {
+        public void success(final JanusPluginHandle pluginHandle) {
             handle = pluginHandle;
             registerUsername();
         }
 
         @Override
-        public void onMessage(JSONObject msg, JSONObject jsepLocal) {
+        public void onMessage(final JSONObject msg, final JSONObject jsepLocal) {
             try
             {
                 final String event = msg.getString("videoroom");

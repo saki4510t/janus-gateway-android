@@ -84,11 +84,11 @@ public class EchoTest {
     public class JanusPluginCallbacks implements IJanusPluginCallbacks {
 
         @Override
-        public void success(JanusPluginHandle pluginHandle) {
+        public void success(final JanusPluginHandle pluginHandle) {
             EchoTest.this.handle = pluginHandle;
 
-                JSONObject msg = new JSONObject();
-                JSONObject obj = new JSONObject();
+                final JSONObject msg = new JSONObject();
+                final JSONObject obj = new JSONObject();
                 try {
                     obj.put("audio", true);
                     obj.put("video", true);
@@ -101,30 +101,33 @@ public class EchoTest {
             handle.createOffer(new IPluginHandleWebRTCCallbacks() {
                 @Override
                 public JSONObject getJsep() {
+                    if (DEBUG) Log.v(TAG, "getJsep:");
                     return null;
                 }
 
                 @Override
-                public void onCallbackError(String error) {
-
+                public void onCallbackError(final String error) {
+                    Log.w(TAG, error);
                 }
 
                 @Override
                 public Boolean getTrickle() {
+                    if (DEBUG) Log.v(TAG, "getTrickle:");
                     return true;
                 }
 
                 @Override
                 public JanusMediaConstraints getMedia() {
+                    if (DEBUG) Log.v(TAG, "getMedia:");
                     return new JanusMediaConstraints();
                 }
 
                 @Override
-                public void onSuccess(JSONObject obj) {
-                    Log.d("JANUSCLIENT", "OnSuccess for CreateOffer called");
+                public void onSuccess(final JSONObject obj) {
+                    if (DEBUG) Log.d(TAG, "OnSuccess for CreateOffer called");
                     try {
-                        JSONObject body = new JSONObject();
-                        JSONObject msg = new JSONObject();
+                        final JSONObject body = new JSONObject();
+                        final JSONObject msg = new JSONObject();
                         body.put("audio", true);
                         body.put("video", true);
                         msg.put("message", body);
@@ -139,83 +142,89 @@ public class EchoTest {
         }
 
         @Override
-        public void onMessage(JSONObject msg, final JSONObject jsepLocal) {
-            if(jsepLocal != null)
+        public void onMessage(final JSONObject msg, final JSONObject jsepLocal) {
+            if (jsepLocal != null)
             {
                 handle.handleRemoteJsep(new IPluginHandleWebRTCCallbacks() {
                     final JSONObject myJsep = jsepLocal;
                     @Override
-                    public void onSuccess(JSONObject obj) {
-
+                    public void onSuccess(final JSONObject obj) {
+                        if (DEBUG) Log.v(TAG, "onSuccess:" + obj);
                     }
 
                     @Override
                     public JSONObject getJsep() {
+                        if (DEBUG) Log.v(TAG, "getJsep:");
                         return myJsep;
                     }
 
                     @Override
                     public JanusMediaConstraints getMedia() {
+                        if (DEBUG) Log.v(TAG, "getMedia:");
                         return null;
                     }
 
                     @Override
                     public Boolean getTrickle() {
-                        return Boolean.FALSE;
+                        if (DEBUG) Log.v(TAG, "getTrickle:");
+                        return false;
                     }
 
                     @Override
                     public void onCallbackError(String error) {
-
+                        Log.w(TAG, error);
                     }
                 });
             }
         }
 
         @Override
-        public void onLocalStream(MediaStream stream) {
+        public void onLocalStream(final MediaStream stream) {
+            if (DEBUG) Log.v(TAG, "onLocalStream:" + stream);
             stream.videoTracks.get(0).addRenderer(new VideoRenderer(localRender));
             VideoRendererGui.update(localRender, 0, 0, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, false);
         }
 
         @Override
-        public void onRemoteStream(MediaStream stream) {
+        public void onRemoteStream(final MediaStream stream) {
+            if (DEBUG) Log.v(TAG, "onRemoteStream:" + stream);
             stream.videoTracks.get(0).setEnabled(true);
-            if(stream.videoTracks.get(0).enabled())
-                Log.d("JANUSCLIENT", "video tracks enabled");
+            if (stream.videoTracks.get(0).enabled())
+                Log.d(TAG, "video tracks enabled");
             stream.videoTracks.get(0).addRenderer(new VideoRenderer(remoteRender));
             VideoRendererGui.update(remoteRender, 0, 0, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, true);
             VideoRendererGui.update(localRender, 72, 72, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, false);
         }
 
         @Override
-        public void onDataOpen(Object data) {
-
+        public void onDataOpen(final Object data) {
+            if (DEBUG) Log.v(TAG, "onDataOpen:" + data);
         }
 
         @Override
-        public void onData(Object data) {
-
+        public void onData(final Object data) {
+            if (DEBUG) Log.v(TAG, "onData:" + data);
         }
 
         @Override
         public void onCleanup() {
-
+            if (DEBUG) Log.v(TAG, "onCleanup:");
         }
 
         @Override
         public JanusSupportedPluginPackages getPlugin() {
+            if (DEBUG) Log.v(TAG, "getPlugin:");
             return JanusSupportedPluginPackages.JANUS_ECHO_TEST;
         }
 
         @Override
-        public void onCallbackError(String error) {
-
+        public void onCallbackError(final String error) {
+            Log.w(TAG, error);
         }
 
         @Override
         public void onDetached() {
-
+            if (DEBUG) Log.v(TAG, "onDetached:");
         }
 
     }
