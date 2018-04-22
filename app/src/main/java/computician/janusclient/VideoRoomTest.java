@@ -2,6 +2,7 @@ package computician.janusclient;
 
 import android.content.Context;
 import android.opengl.EGLContext;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -282,38 +283,52 @@ public class VideoRoomTest {
 
         @Override
         public void onMessage(final JSONObject msg, final JSONObject jsepLocal) {
-            try
-            {
+            try {
                 final String event = msg.getString("videoroom");
-                if(event.equals("joined")) {
-                    myid = new BigInteger(msg.getString("id"));
-                    publishOwnFeed();
-                    if(msg.has(PUBLISHERS)){
-                        JSONArray pubs = msg.getJSONArray(PUBLISHERS);
-                        for(int i = 0; i < pubs.length(); i++) {
-                            JSONObject pub = pubs.getJSONObject(i);
-                            BigInteger tehId = new BigInteger(pub.getString("id"));
-                            newRemoteFeed(tehId);
-                        }
-                    }
-                } else if(event.equals("destroyed")) {
-
-                } else if(event.equals("event")) {
-                    if(msg.has(PUBLISHERS)){
-                        JSONArray pubs = msg.getJSONArray(PUBLISHERS);
-                        for(int i = 0; i < pubs.length(); i++) {
-                            JSONObject pub = pubs.getJSONObject(i);
-                            newRemoteFeed(new BigInteger(pub.getString("id")));
-                        }
-                    } else if(msg.has("leaving")) {
-
-                    } else if(msg.has("unpublished")) {
-
-                    } else {
-                        //todo error
-                    }
-                }
-                if(jsepLocal != null) {
+                if (!TextUtils.isEmpty(event)) {
+                	switch (event) {
+					case "joined":
+					{
+						myid = new BigInteger(msg.getString("id"));
+						publishOwnFeed();
+						if (msg.has(PUBLISHERS)) {
+							final JSONArray pubs = msg.getJSONArray(PUBLISHERS);
+							for (int i = 0; i < pubs.length(); i++) {
+								final JSONObject pub = pubs.getJSONObject(i);
+								final BigInteger tehId = new BigInteger(pub.getString("id"));
+								newRemoteFeed(tehId);
+							}
+						}
+						break;
+					}
+					case "destroyed":
+					{
+						if (DEBUG) Log.v(TAG, "destroyed:");
+						break;
+					}
+					case "event":
+					{
+						if (msg.has(PUBLISHERS)) {
+							final JSONArray pubs = msg.getJSONArray(PUBLISHERS);
+							for (int i = 0; i < pubs.length(); i++) {
+								final JSONObject pub = pubs.getJSONObject(i);
+								newRemoteFeed(new BigInteger(pub.getString("id")));
+							}
+						} else if(msg.has("leaving")) {
+							if (DEBUG) Log.v(TAG, "leaving:");
+						} else if (msg.has("unpublished")) {
+							if (DEBUG) Log.v(TAG, "unpublished:");
+						} else {
+							if (DEBUG) Log.v(TAG, "unknown event:" + event);
+							//todo error
+						}
+						break;
+					}
+					default:
+						break;
+					}
+				}
+                if (jsepLocal != null) {
                     handle.handleRemoteJsep(new PluginHandleWebRTCCallbacks(null, jsepLocal, false));
                 }
             }
