@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="room_description">
+		Please enter a room name. Room names are shared with everyone, so think
+		of something unique and send it to a friend.
+	</string>
+	<string name="connect_description">Connect to the room</string>
+	<string name="add_favorite_description">Add favorite</string>
+	<string name="favorites">Favorites</string>
+	<string name="no_favorites">No favorites</string>
+
+	<string name="invalid_url_title">Invalid URL</string>
+	<string name="invalid_url_text">
+		The URL or room name you entered resulted in an invalid URL: %1$s
+	</string>
+</resources>
