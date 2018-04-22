@@ -1,5 +1,6 @@
 package computician.janusclientapi;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.PrintWriter;
@@ -37,12 +38,18 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
         return type;
     }
 
+    @Override
     public void connect() {
         AsyncHttpClient.getDefaultInstance().websocket(uri, "janus-protocol", new AsyncHttpClient.WebSocketConnectCallback() {
             @Override
-            public void onCompleted(Exception ex, WebSocket webSocket) {
+            public void onCompleted(@Nullable final Exception ex, @Nullable final WebSocket webSocket) {
                 if (ex != null) {
                     handler.onError(ex);
+                    return;
+                }
+                if (webSocket == null) {
+                    handler.onError(new RuntimeException("webSocket is null"));
+                    return;
                 }
                 client = webSocket;
                 client.setWriteableCallback(new WritableCallback() {
@@ -103,19 +110,6 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
         });
     }
 
-    private void onMessage(String message) {
-        Log.d("JANUSCLIENT", "Recv: \n\t" + message);
-        receivedMessage(message);
-    }
-
-    private void onClose(int code, String reason, boolean remote) {
-        handler.onClose();
-    }
-
-    private void onError(Exception ex) {
-        handler.onError(ex);
-    }
-
     @Override
     public void disconnect() {
         client.close();
@@ -146,4 +140,18 @@ public class JanusWebsocketMessenger implements IJanusMessenger {
             handler.onError(ex);
         }
     }
+
+    private void onMessage(String message) {
+        Log.d("JANUSCLIENT", "Recv: \n\t" + message);
+        receivedMessage(message);
+    }
+
+    private void onClose(int code, String reason, boolean remote) {
+        handler.onClose();
+    }
+
+    private void onError(Exception ex) {
+        handler.onError(ex);
+    }
+
 }
