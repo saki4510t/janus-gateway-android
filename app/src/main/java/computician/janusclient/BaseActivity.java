@@ -180,7 +180,7 @@ public abstract class BaseActivity extends Activity
 	 * @param attributeId
 	 * @param defaultId
 	 */
-	private String sharedPrefGetString(final SharedPreferences sharedPref,
+	protected String sharedPrefGetString(final SharedPreferences sharedPref,
 		@StringRes final int attributeId, @StringRes final int defaultId) {
 
 		return sharedPref.getString(getString(attributeId), getString(defaultId));
@@ -193,7 +193,7 @@ public abstract class BaseActivity extends Activity
 	 * @param attributeId
 	 * @param defaultId
 	 */
-	private boolean sharedPrefGetBoolean(final SharedPreferences sharedPref,
+	protected boolean sharedPrefGetBoolean(final SharedPreferences sharedPref,
 		@StringRes final int attributeId, @StringRes final int defaultId) {
 
 		return sharedPref.getBoolean(getString(attributeId),
@@ -207,7 +207,7 @@ public abstract class BaseActivity extends Activity
 	 * @param attributeId
 	 * @param defaultId
 	 */
-	private int sharedPrefGetInteger(final SharedPreferences sharedPref,
+	protected int sharedPrefGetInteger(final SharedPreferences sharedPref,
 		@StringRes final int attributeId, @StringRes final int defaultId) {
 
 		final String defaultString = getString(defaultId);
