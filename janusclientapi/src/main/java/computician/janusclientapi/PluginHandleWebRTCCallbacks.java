@@ -39,7 +39,7 @@ public class PluginHandleWebRTCCallbacks implements IPluginHandleWebRTCCallbacks
     }
 
     @Override
-    public Boolean getTrickle() {
+    public boolean getTrickle() {
         return trickle;
     }
 

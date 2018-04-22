@@ -315,7 +315,7 @@ public class JanusPluginHandle {
 				}
 			}
 		} else {
-			trickle = callbacks.getTrickle() != null ? callbacks.getTrickle() : false;
+			trickle = callbacks.getTrickle();
 			AudioTrack audioTrack = null;
 			VideoTrack videoTrack = null;
 			MediaStream stream = null;

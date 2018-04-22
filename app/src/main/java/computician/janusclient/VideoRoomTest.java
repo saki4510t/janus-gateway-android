@@ -131,7 +131,7 @@ public class VideoRoomTest {
                         }
 
                         @Override
-                        public Boolean getTrickle() {
+                        public boolean getTrickle() {
                             return true;
                         }
 
@@ -228,7 +228,7 @@ public class VideoRoomTest {
                     }
 
                     @Override
-                    public Boolean getTrickle() {
+                    public boolean getTrickle() {
                         return true;
                     }
 

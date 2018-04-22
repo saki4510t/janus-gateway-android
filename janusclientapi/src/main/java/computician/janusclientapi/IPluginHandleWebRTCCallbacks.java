@@ -12,5 +12,5 @@ public interface IPluginHandleWebRTCCallbacks extends IJanusCallbacks {
 
     JanusMediaConstraints getMedia();
 
-    Boolean getTrickle();
+    boolean getTrickle();
 }

@@ -112,7 +112,7 @@ public class EchoTest {
                 }
 
                 @Override
-                public Boolean getTrickle() {
+                public boolean getTrickle() {
                     if (DEBUG) Log.v(TAG, "getTrickle:");
                     return true;
                 }
@@ -166,7 +166,7 @@ public class EchoTest {
                     }
 
                     @Override
-                    public Boolean getTrickle() {
+                    public boolean getTrickle() {
                         if (DEBUG) Log.v(TAG, "getTrickle:");
                         return false;
                     }
