@@ -10,8 +10,14 @@ import com.serenegiant.dialog.MessageDialogFragment;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.PermissionCheck;
 
+/**
+ * created by t_saki t_saki@serenegiant.com 2018/04/22
+ */
 public abstract class BaseActivity extends Activity
 	implements MessageDialogFragment.MessageDialogListener {
+
+	private static final boolean DEBUG = true;	// set false on  production
+	private static final String TAG = BaseActivity.class.getSimpleName();
 
 	static int ID_PERMISSION_REASON_AUDIO = R.string.permission_audio_reason;
 	static int ID_PERMISSION_REQUEST_AUDIO = R.string.permission_audio_request;

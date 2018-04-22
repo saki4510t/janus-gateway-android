@@ -20,9 +20,12 @@ import org.json.JSONObject;
 
 /**
  * Created by ben.trent on 5/7/2015.
+ * Modified by t_saki t_saki@serenegiant.com on 2018
  */
 public class JanusWebsocketMessenger implements IJanusMessenger {
-
+	private static final boolean DEBUG = true;	// set false on  production
+	private static final String TAG = JanusWebsocketMessenger.class.getSimpleName();
+ 
     private final String uri;
     private final IJanusMessageObserver handler;
     private final JanusMessengerType type = JanusMessengerType.websocket;

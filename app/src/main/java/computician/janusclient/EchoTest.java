@@ -24,11 +24,14 @@ import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 
 /**
  * Created by ben.trent on 7/24/2015.
+ * Modified by t_saki t_saki@serenegiant.com on 2018
  */
 
 //TODO create message classes unique to this plugin
 
 public class EchoTest {
+    private static final boolean DEBUG = true;	// set false on  production
+   	private static final String TAG = EchoTest.class.getSimpleName();
 
     private static final String JANUS_URI = "ws://192.168.1.197:8188";
     private JanusPluginHandle handle = null;

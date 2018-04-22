@@ -29,8 +29,12 @@ import computician.janusclientapi.PluginHandleWebRTCCallbacks;
 //TODO create message classes unique to this plugin
 /**
  * Created by ben.trent on 7/24/2015.
+ * Modified by t_saki t_saki@serenegiant.com on 2018
  */
 public class VideoRoomTest {
+	private static final boolean DEBUG = true;	// set false on  production
+	private static final String TAG = VideoRoomTest.class.getSimpleName();
+
     public static final String REQUEST = "request";
     public static final String MESSAGE = "message";
     public static final String PUBLISHERS = "publishers";

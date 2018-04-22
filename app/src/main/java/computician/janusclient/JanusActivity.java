@@ -12,7 +12,13 @@ import android.view.WindowManager;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
 
+/**
+ * Modified by t_saki t_saki@serenegiant.com on 2018
+ */
 public class JanusActivity extends BaseActivity {
+	private static final boolean DEBUG = true;	// set false on  production
+	private static final String TAG = JanusActivity.class.getSimpleName();
+
     private static final boolean AUTO_HIDE = true;
 
     /**
