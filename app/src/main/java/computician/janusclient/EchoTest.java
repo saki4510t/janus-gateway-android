@@ -30,7 +30,7 @@ import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 
 public class EchoTest {
 
-    private final String JANUS_URI = "ws://192.168.1.197:8188";
+    private static final String JANUS_URI = "ws://192.168.1.197:8188";
     private JanusPluginHandle handle = null;
     private final VideoRenderer.Callbacks localRender, remoteRender;
     private final JanusServer janusServer;

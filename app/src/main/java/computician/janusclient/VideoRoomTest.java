@@ -2,14 +2,12 @@ package computician.janusclient;
 
 import android.content.Context;
 import android.opengl.EGLContext;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.VideoRenderer;
-import org.webrtc.VideoRendererGui;
 
 import java.math.BigInteger;
 import java.util.ArrayDeque;
@@ -17,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 import computician.janusclientapi.IJanusGatewayCallbacks;
 import computician.janusclientapi.IJanusPluginCallbacks;
@@ -37,15 +34,16 @@ public class VideoRoomTest {
     public static final String REQUEST = "request";
     public static final String MESSAGE = "message";
     public static final String PUBLISHERS = "publishers";
-    private final String JANUS_URI = "ws://192.168.1.197:8188";
+    private static final String JANUS_URI = "ws://192.168.1.197:8188";
+    private static final String user_name = "android";
+    private static final int roomid = 1234;
+
     private JanusPluginHandle handle = null;
     private VideoRenderer.Callbacks localRender;
     private Deque<VideoRenderer.Callbacks> availableRemoteRenderers = new ArrayDeque<>();
     private HashMap<BigInteger, VideoRenderer.Callbacks> remoteRenderers = new HashMap<>();
     private JanusServer janusServer;
     private BigInteger myid;
-    final private String user_name = "android";
-    final private int roomid = 1234;
 
     public VideoRoomTest(VideoRenderer.Callbacks localRender, VideoRenderer.Callbacks[] remoteRenders) {
         this.localRender = localRender;

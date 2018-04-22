@@ -1,7 +1,6 @@
 package computician.janusclient;
 
 import computician.janusclient.util.SystemUiHider;
-import computician.janusclientapi.*;
 
 import android.app.Activity;
 import android.opengl.EGLContext;
@@ -16,12 +15,6 @@ import org.webrtc.VideoRendererGui;
 
 public class JanusActivity extends Activity {
     private static final boolean AUTO_HIDE = true;
-
-    private GLSurfaceView vsv;
-    private VideoRenderer.Callbacks localRender;
-    private VideoRenderer.Callbacks remoteRender;
-    private EchoTest echoTest;
-    private VideoRoomTest videoRoomTest;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -39,6 +32,12 @@ public class JanusActivity extends Activity {
      * The flags to pass to {@link SystemUiHider#getInstance}.
      */
     private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
+
+    private GLSurfaceView vsv;
+    private VideoRenderer.Callbacks localRender;
+    private VideoRenderer.Callbacks remoteRender;
+    private EchoTest echoTest;
+    private VideoRoomTest videoRoomTest;
 
     /**
      * The instance of the {@link SystemUiHider} for this activity.
@@ -74,7 +73,7 @@ public class JanusActivity extends Activity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        vsv = (GLSurfaceView) findViewById(R.id.glview);
+        vsv = findViewById(R.id.glview);
         vsv.setPreserveEGLContextOnPause(true);
         vsv.setKeepScreenOn(true);
         VideoRendererGui.setView(vsv, new MyInit());
