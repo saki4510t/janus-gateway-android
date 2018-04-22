@@ -25,11 +25,11 @@ public enum JanusMessageType {
         return name();
     }
 
-    public boolean EqualsString(String type) {
+    public boolean EqualsString(final String type) {
         return this.toString().equals(type);
     }
 
-    public static JanusMessageType fromString(String string) {
-        return (JanusMessageType) valueOf(JanusMessageType.class, string.toLowerCase());
+    public static JanusMessageType fromString(final String string) {
+        return valueOf(JanusMessageType.class, string.toLowerCase());
     }
 }

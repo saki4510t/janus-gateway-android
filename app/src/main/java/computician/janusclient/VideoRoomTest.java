@@ -272,7 +272,7 @@ public class VideoRoomTest {
                 remoteRenderers.put(id, availableRemoteRenderers.pop());
             }
             myrenderer = remoteRenderers.get(id);
-            janusServer.Attach(new ListenerAttachCallbacks(id, myrenderer));
+            janusServer.attach(new ListenerAttachCallbacks(id, myrenderer));
         }
 
         @Override
@@ -384,7 +384,7 @@ public class VideoRoomTest {
     public class JanusGlobalCallbacks implements IJanusGatewayCallbacks {
         public void onSuccess() {
 			if (DEBUG) Log.v(TAG, "onSuccess:");
-            janusServer.Attach(new JanusPublisherPluginCallbacks());
+            janusServer.attach(new JanusPublisherPluginCallbacks());
         }
 
         @Override
@@ -427,7 +427,7 @@ public class VideoRoomTest {
     }
 
     public void Start() {
-        janusServer.Connect();
+        janusServer.connect();
     }
 
 }

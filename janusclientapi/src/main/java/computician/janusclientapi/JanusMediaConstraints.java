@@ -21,7 +21,7 @@ public class JanusMediaConstraints {
             return maxHeight;
         }
 
-        public void setMaxHeight(int maxHeight) {
+        public void setMaxHeight(final int maxHeight) {
             this.maxHeight = maxHeight;
         }
 
@@ -29,7 +29,7 @@ public class JanusMediaConstraints {
             return minHeight;
         }
 
-        public void setMinHeight(int minHeight) {
+        public void setMinHeight(final int minHeight) {
             this.minHeight = minHeight;
         }
 
@@ -37,7 +37,7 @@ public class JanusMediaConstraints {
             return maxWidth;
         }
 
-        public void setMaxWidth(int maxWidth) {
+        public void setMaxWidth(final int maxWidth) {
             this.maxWidth = maxWidth;
         }
 
@@ -45,7 +45,7 @@ public class JanusMediaConstraints {
             return minWidth;
         }
 
-        public void setMinWidth(int minWidth) {
+        public void setMinWidth(final int minWidth) {
             this.minWidth = minWidth;
         }
 
@@ -53,7 +53,7 @@ public class JanusMediaConstraints {
             return maxFramerate;
         }
 
-        public void setMaxFramerate(int maxFramerate) {
+        public void setMaxFramerate(final int maxFramerate) {
             this.maxFramerate = maxFramerate;
         }
 
@@ -61,7 +61,7 @@ public class JanusMediaConstraints {
             return minFramerate;
         }
 
-        public void setMinFramerate(int minFramerate) {
+        public void setMinFramerate(final int minFramerate) {
             this.minFramerate = minFramerate;
         }
     }
@@ -88,7 +88,7 @@ public class JanusMediaConstraints {
         return video != null;
     }
 
-    public void setVideo(JanusVideo video) {
+    public void setVideo(final JanusVideo video) {
         this.video = video;
     }
 
@@ -96,11 +96,11 @@ public class JanusMediaConstraints {
         return sendAudio;
     }
 
-    public void setSendAudio(boolean sendAudio) {
+    public void setSendAudio(final boolean sendAudio) {
         this.sendAudio = sendAudio;
     }
 
-    public void setRecvVideo(boolean recvVideo) {
+    public void setRecvVideo(final boolean recvVideo) {
         this.recvVideo = recvVideo;
     }
 
@@ -108,7 +108,7 @@ public class JanusMediaConstraints {
         return recvVideo;
     }
 
-    public void setRecvAudio(boolean recvAudio) {
+    public void setRecvAudio(final boolean recvAudio) {
         this.recvAudio = recvAudio;
     }
 
@@ -117,10 +117,12 @@ public class JanusMediaConstraints {
     }
 
     public Camera getCamera() {
+        // FIXME should remove
         return camera;
     }
 
-    public void setCamera(Camera camera) {
+    public void setCamera(final Camera camera) {
+        // FIXME should remove
         this.camera = camera;
     }
 

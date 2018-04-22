@@ -10,7 +10,7 @@ public class JanusCreateSessionTransaction implements ITransactionCallbacks {
 
     private final IJanusSessionCreationCallbacks callbacks;
 
-    public JanusCreateSessionTransaction(IJanusSessionCreationCallbacks callbacks) {
+    public JanusCreateSessionTransaction(final IJanusSessionCreationCallbacks callbacks) {
         this.callbacks = callbacks;
     }
 
@@ -19,9 +19,9 @@ public class JanusCreateSessionTransaction implements ITransactionCallbacks {
     }
 
     @Override
-    public void reportSuccess(JSONObject obj) {
+    public void reportSuccess(final JSONObject obj) {
         try {
-            JanusMessageType type = JanusMessageType.fromString(obj.getString("janus"));
+            final JanusMessageType type = JanusMessageType.fromString(obj.getString("janus"));
             if (type != JanusMessageType.success) {
                 callbacks.onCallbackError(obj.getJSONObject("error").getString("reason"));
             } else {

@@ -6,17 +6,17 @@ import org.json.JSONObject;
 import org.webrtc.MediaStream;
 
 public interface IJanusPluginCallbacks extends IJanusCallbacks {
-    void success(JanusPluginHandle handle);
+    void success(final JanusPluginHandle handle);
 
-    void onMessage(JSONObject msg, JSONObject jsep);
+    void onMessage(final JSONObject msg, final JSONObject jsep);
 
-    void onLocalStream(MediaStream stream);
+    void onLocalStream(final MediaStream stream);
 
-    void onRemoteStream(MediaStream stream);
+    void onRemoteStream(final MediaStream stream);
 
-    void onDataOpen(Object data);
+    void onDataOpen(final Object data);
 
-    void onData(Object data);
+    void onData(final Object data);
 
     void onCleanup();
 

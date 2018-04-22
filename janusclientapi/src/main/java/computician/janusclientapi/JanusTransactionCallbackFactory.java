@@ -5,7 +5,9 @@ package computician.janusclientapi;
  */
 class JanusTransactionCallbackFactory {
 
-    public static ITransactionCallbacks createNewTransactionCallback(JanusServer server, TransactionType type) {
+    public static ITransactionCallbacks createNewTransactionCallback(
+        final JanusServer server, final TransactionType type) {
+
         switch (type) {
             case create:
                 return new JanusCreateSessionTransaction(server);
@@ -14,7 +16,11 @@ class JanusTransactionCallbackFactory {
         }
     }
 
-    public static ITransactionCallbacks createNewTransactionCallback(JanusServer server, TransactionType type, JanusSupportedPluginPackages plugin, IPluginHandleWebRTCCallbacks callbacks) {
+    public static ITransactionCallbacks createNewTransactionCallback(
+        final JanusServer server, TransactionType type,
+        final JanusSupportedPluginPackages plugin,
+        final IPluginHandleWebRTCCallbacks callbacks) {
+
         switch (type) {
             case plugin_handle_webrtc_message:
                 return new JanusWebRtcTransaction(plugin, callbacks);
@@ -23,7 +29,12 @@ class JanusTransactionCallbackFactory {
         }
     }
 
-    public static ITransactionCallbacks createNewTransactionCallback(JanusServer server, TransactionType type, JanusSupportedPluginPackages plugin, IPluginHandleSendMessageCallbacks callbacks) {
+    public static ITransactionCallbacks createNewTransactionCallback(
+        final JanusServer server,
+        final TransactionType type,
+        final JanusSupportedPluginPackages plugin,
+        final IPluginHandleSendMessageCallbacks callbacks) {
+
         switch (type) {
             case plugin_handle_message:
                 return new JanusSendPluginMessageTransaction(plugin, callbacks);
@@ -32,7 +43,12 @@ class JanusTransactionCallbackFactory {
         }
     }
 
-    public static ITransactionCallbacks createNewTransactionCallback(JanusServer server, TransactionType type, JanusSupportedPluginPackages plugin, IJanusPluginCallbacks callbacks) {
+    public static ITransactionCallbacks createNewTransactionCallback(
+        final JanusServer server,
+        final TransactionType type,
+        final JanusSupportedPluginPackages plugin,
+        final IJanusPluginCallbacks callbacks) {
+
         switch (type) {
             case create:
                 return new JanusCreateSessionTransaction(server);

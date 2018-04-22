@@ -44,7 +44,7 @@ public class EchoTest {
         @Override
         public void onSuccess() {
             if (DEBUG) Log.v(TAG, "onSuccess:");
-            janusServer.Attach(new JanusPluginCallbacks());
+            janusServer.attach(new JanusPluginCallbacks());
         }
 
         @Override
@@ -241,6 +241,6 @@ public class EchoTest {
     }
 
     public void Start() {
-        janusServer.Connect();
+        janusServer.connect();
     }
 }

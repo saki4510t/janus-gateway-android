@@ -1,23 +1,30 @@
 package computician.janusclientapi;
 
+import android.util.Log;
+
 import org.json.JSONObject;
 
 /**
  * Created by ben.trent on 8/13/2015.
  */
 public class PluginHandleWebRTCCallbacks implements IPluginHandleWebRTCCallbacks {
+    private static final boolean DEBUG = true;	// set false on  production
+   	private static final String TAG = PluginHandleWebRTCCallbacks.class.getSimpleName();
 
     private final JanusMediaConstraints constraints;
     private final JSONObject jsep;
     private final boolean trickle;
-    public PluginHandleWebRTCCallbacks(JanusMediaConstraints constraints, JSONObject jsep, boolean trickle) {
+
+    public PluginHandleWebRTCCallbacks(final JanusMediaConstraints constraints,
+        final JSONObject jsep, final boolean trickle) {
+
         this.constraints = constraints;
         this.jsep = jsep;
         this.trickle = trickle;
     }
 
     @Override
-    public void onSuccess(JSONObject obj) {
+    public void onSuccess(final JSONObject obj) {
 
     }
 
@@ -37,7 +44,7 @@ public class PluginHandleWebRTCCallbacks implements IPluginHandleWebRTCCallbacks
     }
 
     @Override
-    public void onCallbackError(String error) {
-
+    public void onCallbackError(final String error) {
+        Log.w(TAG, error);
     }
 }

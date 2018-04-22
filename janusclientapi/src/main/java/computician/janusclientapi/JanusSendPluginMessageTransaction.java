@@ -9,7 +9,10 @@ import org.json.JSONObject;
 public class JanusSendPluginMessageTransaction implements ITransactionCallbacks {
     private final IPluginHandleSendMessageCallbacks callbacks;
 
-    public JanusSendPluginMessageTransaction(JanusSupportedPluginPackages plugin, IPluginHandleSendMessageCallbacks callbacks) {
+    public JanusSendPluginMessageTransaction(
+    	final JanusSupportedPluginPackages plugin,
+        final IPluginHandleSendMessageCallbacks callbacks) {
+
         this.callbacks = callbacks;
     }
 
@@ -17,14 +20,16 @@ public class JanusSendPluginMessageTransaction implements ITransactionCallbacks 
         return TransactionType.plugin_handle_message;
     }
 
-    public void reportSuccess(JSONObject obj) {
+    public void reportSuccess(final JSONObject obj) {
         try {
-            JanusMessageType type = JanusMessageType.fromString(obj.getString("janus"));
+            final JanusMessageType type = JanusMessageType.fromString(obj.getString("janus"));
             switch (type) {
                 case success: {
-                    JSONObject plugindata = obj.getJSONObject("plugindata");
-                    JanusSupportedPluginPackages plugin = JanusSupportedPluginPackages.fromString(plugindata.getString("plugin"));
-                    JSONObject data = plugindata.getJSONObject("data");
+                    final JSONObject plugindata = obj.getJSONObject("plugindata");
+                    final JanusSupportedPluginPackages plugin
+                    	= JanusSupportedPluginPackages.fromString(plugindata.getString("plugin"));
+
+                    final JSONObject data = plugindata.getJSONObject("data");
                     if (plugin == JanusSupportedPluginPackages.JANUS_NONE) {
                         callbacks.onCallbackError("unexpected message: \n\t" + obj.toString());
                     } else {
@@ -42,7 +47,7 @@ public class JanusSendPluginMessageTransaction implements ITransactionCallbacks 
                 }
             }
 
-        } catch (JSONException ex) {
+        } catch (final JSONException ex) {
             callbacks.onCallbackError(ex.getMessage());
         }
     }

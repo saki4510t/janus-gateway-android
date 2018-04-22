@@ -40,10 +40,10 @@ public class JanusServer implements Runnable,
     }
 
     private final RandomString stringGenerator = new RandomString();
-    private ConcurrentHashMap<BigInteger, JanusPluginHandle> attachedPlugins = new ConcurrentHashMap<BigInteger, JanusPluginHandle>();
-    private Object attachedPluginsLock = new Object();
-    private ConcurrentHashMap<String, ITransactionCallbacks> transactions = new ConcurrentHashMap<String, ITransactionCallbacks>();
-    private Object transactionsLock = new Object();
+    private final ConcurrentHashMap<BigInteger, JanusPluginHandle> attachedPlugins = new ConcurrentHashMap<BigInteger, JanusPluginHandle>();
+    private final Object attachedPluginsLock = new Object();
+    private final ConcurrentHashMap<String, ITransactionCallbacks> transactions = new ConcurrentHashMap<String, ITransactionCallbacks>();
+    private final Object transactionsLock = new Object();
     public final String serverUri;
     public final IJanusGatewayCallbacks gatewayObserver;
     public final List<PeerConnection.IceServer> iceServers;
@@ -54,17 +54,23 @@ public class JanusServer implements Runnable,
     private final IJanusMessenger serverConnection;
     private volatile Thread keep_alive;
     private Boolean peerConnectionFactoryInitialized = false;
-
-    private class AsyncAttach extends AsyncTask<IJanusPluginCallbacks, Void ,Void>{
-        protected Void doInBackground(IJanusPluginCallbacks... cbs){
-            IJanusPluginCallbacks cb = cbs[0];
+	
+	/**
+	 * FIXME This class should be static otherwise this will leak
+	 */
+    private class AsyncAttach extends AsyncTask<IJanusPluginCallbacks, Void ,Void> {
+        protected Void doInBackground(final IJanusPluginCallbacks... cbs){
+            final IJanusPluginCallbacks cb = cbs[0];
             try {
-                JSONObject obj = new JSONObject();
+                final JSONObject obj = new JSONObject();
                 obj.put("janus", JanusMessageType.attach);
                 obj.put("plugin", cb.getPlugin());
                 if (serverConnection.getMessengerType() == JanusMessengerType.websocket)
                     obj.put("session_id", sessionId);
-                ITransactionCallbacks tcb = JanusTransactionCallbackFactory.createNewTransactionCallback(JanusServer.this, TransactionType.attach, cb.getPlugin(), cb);
+                final ITransactionCallbacks tcb
+                	= JanusTransactionCallbackFactory
+                		.createNewTransactionCallback(JanusServer.this,
+                			TransactionType.attach, cb.getPlugin(), cb);
                 String transaction = putNewTransaction(tcb);
                 obj.put("transaction", transaction);
                 serverConnection.sendMessage(obj.toString(), sessionId);
@@ -98,10 +104,12 @@ public class JanusServer implements Runnable,
 
     private void createSession() {
         try {
-            JSONObject obj = new JSONObject();
+            final JSONObject obj = new JSONObject();
             obj.put("janus", JanusMessageType.create);
-            ITransactionCallbacks cb = JanusTransactionCallbackFactory.createNewTransactionCallback(this, TransactionType.create);
-            String transaction = putNewTransaction(cb);
+            final ITransactionCallbacks cb
+            	= JanusTransactionCallbackFactory
+            		.createNewTransactionCallback(this, TransactionType.create);
+            final String transaction = putNewTransaction(cb);
             obj.put("transaction", transaction);
             serverConnection.sendMessage(obj.toString());
         } catch (JSONException ex) {
@@ -109,30 +117,35 @@ public class JanusServer implements Runnable,
         }
     }
 
-    public boolean initializeMediaContext(Context context, boolean audio, boolean video, boolean videoHwAcceleration, EGLContext eglContext) {
-        if (!PeerConnectionFactory.initializeAndroidGlobals(context, audio, video, videoHwAcceleration, eglContext))
+    public boolean initializeMediaContext(final Context context,
+    	final boolean audio, final boolean video,
+    	final boolean videoHwAcceleration, final EGLContext eglContext) {
+
+        if (!PeerConnectionFactory.initializeAndroidGlobals(context,
+        	audio, video, videoHwAcceleration, eglContext)) {
+
             return false;
+		}
         peerConnectionFactoryInitialized = true;
         return true;
     }
 
     public void run() {
-        Thread thisThread = Thread.currentThread();
-        while (keep_alive == thisThread) {
+        while (keep_alive == Thread.currentThread()) {
             try {
-                thisThread.sleep(25000);
+				Thread.sleep(25000);
             } catch (InterruptedException ex) {
             }
             if (!connected || serverConnection.getMessengerType() != JanusMessengerType.websocket)
                 return;
-            JSONObject obj = new JSONObject();
+            final JSONObject obj = new JSONObject();
             try {
                 obj.put("janus", JanusMessageType.keepalive.toString());
                 if (serverConnection.getMessengerType() == JanusMessengerType.websocket)
                     obj.put("session_id", sessionId);
                 obj.put("transaction", stringGenerator.randomString(12));
                 serverConnection.sendMessage(obj.toString(), sessionId);
-            } catch (JSONException ex) {
+            } catch (final JSONException ex) {
                 gatewayObserver.onCallbackError("Keep alive failed is Janus online?" + ex.getMessage());
                 connected = false;
                 return;
@@ -140,7 +153,7 @@ public class JanusServer implements Runnable,
         }
     }
 
-    public Boolean isConnected() {
+    public boolean isConnected() {
         return connected;
     }
 
@@ -148,33 +161,37 @@ public class JanusServer implements Runnable,
         return sessionId;
     }
 
-    public void Attach(IJanusPluginCallbacks callbacks) {
+    public void attach(final IJanusPluginCallbacks callbacks) {
         if (!peerConnectionFactoryInitialized) {
-            callbacks.onCallbackError("Peerconnection factory is not initialized, please initialize via initializeMediaContext so that peerconnections can be made by the plugins");
+            callbacks.onCallbackError("Peerconnection factory is not initialized," +
+             	"please initialize via initializeMediaContext" +
+             	 "so that peerconnections can be made by the plugins");
             return;
         }
         new AsyncAttach().execute(callbacks);
     }
 
-    public void Destroy() {
+    public void destroy() {
         serverConnection.disconnect();
         keep_alive = null;
         connected = false;
         gatewayObserver.onDestroy();
-        for (ConcurrentHashMap.Entry<BigInteger, JanusPluginHandle> handle : attachedPlugins.entrySet()) {
+        for (final ConcurrentHashMap.Entry<BigInteger, JanusPluginHandle> handle
+        	: attachedPlugins.entrySet()) {
+
             handle.getValue().detach();
         }
         synchronized (transactionsLock) {
-            for (Object trans : transactions.entrySet())
+            for (final Object trans : transactions.entrySet())
                 transactions.remove(trans);
         }
     }
 
-    public void Connect() {
+    public void connect() {
         serverConnection.connect();
     }
 
-    public void newMessageForPlugin(String message, BigInteger plugin_id) {
+    public void newMessageForPlugin(final String message, final BigInteger plugin_id) {
         JanusPluginHandle handle = null;
         synchronized (attachedPluginsLock) {
             handle = attachedPlugins.get(plugin_id);
@@ -185,11 +202,13 @@ public class JanusServer implements Runnable,
     }
 
     @Override
-    public void onCallbackError(String msg) {
+    public void onCallbackError(final String msg) {
         gatewayObserver.onCallbackError(msg);
     }
 
-    public void sendMessage(JSONObject msg, JanusMessageType type, BigInteger handle) {
+    public void sendMessage(final JSONObject msg,
+    	final JanusMessageType type, final BigInteger handle) {
+
         try {
             msg.put("janus", type.toString());
             if (serverConnection.getMessengerType() == JanusMessengerType.websocket) {
@@ -212,40 +231,50 @@ public class JanusServer implements Runnable,
 
     //TODO not sure if the send message functions should be Asynchronous
 
-    public void sendMessage(TransactionType type, BigInteger handle, IPluginHandleSendMessageCallbacks callbacks, JanusSupportedPluginPackages plugin) {
-        JSONObject msg = callbacks.getMessage();
+    public void sendMessage(final TransactionType type, final BigInteger handle,
+    	final IPluginHandleSendMessageCallbacks callbacks,
+    	final JanusSupportedPluginPackages plugin) {
+    	
+		final JSONObject msg = callbacks.getMessage();
         if (msg != null) {
             try {
-                JSONObject newMessage = new JSONObject();
+                final JSONObject newMessage = new JSONObject();
                 newMessage.put("janus", JanusMessageType.message.toString());
 
                 if (serverConnection.getMessengerType() == JanusMessengerType.websocket) {
                     newMessage.put("session_id", sessionId);
                     newMessage.put("handle_id", handle);
                 }
-                ITransactionCallbacks cb = JanusTransactionCallbackFactory.createNewTransactionCallback(this, TransactionType.plugin_handle_message, plugin, callbacks);
-                String transaction = putNewTransaction(cb);
+                final ITransactionCallbacks cb = JanusTransactionCallbackFactory
+                	.createNewTransactionCallback(this,
+                		TransactionType.plugin_handle_message, plugin, callbacks);
+                final String transaction = putNewTransaction(cb);
                 newMessage.put("transaction", transaction);
                 if (msg.has("message"))
                     newMessage.put("body", msg.getJSONObject("message"));
                 if (msg.has("jsep"))
                     newMessage.put("jsep", msg.getJSONObject("jsep"));
                 serverConnection.sendMessage(newMessage.toString(), sessionId, handle);
-            } catch (JSONException ex) {
+            } catch (final JSONException ex) {
                 callbacks.onCallbackError(ex.getMessage());
             }
         }
     }
 
-    public void sendMessage(TransactionType type, BigInteger handle, IPluginHandleWebRTCCallbacks callbacks, JanusSupportedPluginPackages plugin) {
+    public void sendMessage(final TransactionType type, final BigInteger handle,
+    	final IPluginHandleWebRTCCallbacks callbacks,
+    	final JanusSupportedPluginPackages plugin) {
+
         try {
-            JSONObject msg = new JSONObject();
+            final JSONObject msg = new JSONObject();
             msg.put("janus", JanusMessageType.message.toString());
             if (serverConnection.getMessengerType() == JanusMessengerType.websocket) {
                 msg.put("session_id", sessionId);
                 msg.put("handle_id", handle);
             }
-            ITransactionCallbacks cb = JanusTransactionCallbackFactory.createNewTransactionCallback(this, TransactionType.plugin_handle_webrtc_message, plugin, callbacks);
+            final ITransactionCallbacks cb = JanusTransactionCallbackFactory
+            	.createNewTransactionCallback(this,
+            		TransactionType.plugin_handle_webrtc_message, plugin, callbacks);
             String transaction = putNewTransaction(cb);
             msg.put("transaction", transaction);
             if (callbacks.getJsep() != null) {
@@ -259,9 +288,9 @@ public class JanusServer implements Runnable,
 
     //region MessageObserver
     @Override
-    public void receivedNewMessage(JSONObject obj) {
+    public void receivedNewMessage(final JSONObject obj) {
         try {
-            JanusMessageType type = JanusMessageType.fromString(obj.getString("janus"));
+            final JanusMessageType type = JanusMessageType.fromString(obj.getString("janus"));
             String transaction = null;
             BigInteger sender = null;
             if (obj.has("transaction")) {
@@ -296,7 +325,7 @@ public class JanusServer implements Runnable,
                     break;
                 }
                 case hangup: {
-                    if(handle != null) {
+                    if (handle != null) {
                         handle.hangUp();
                     }
                     break;
@@ -325,7 +354,7 @@ public class JanusServer implements Runnable,
                     }
                 }
             }
-        } catch (JSONException ex) {
+        } catch (final JSONException ex) {
             gatewayObserver.onCallbackError(ex.getMessage());
         }
     }
@@ -350,7 +379,7 @@ public class JanusServer implements Runnable,
 
     //region SessionCreationCallbacks
     @Override
-    public void onSessionCreationSuccess(JSONObject obj) {
+    public void onSessionCreationSuccess(final JSONObject obj) {
         try {
             sessionId = new BigInteger(obj.getJSONObject("data").getString("id"));
             keep_alive = new Thread(this, "KeepAlive");
@@ -358,7 +387,7 @@ public class JanusServer implements Runnable,
             connected = true;
             //TODO do we want to keep track of multiple sessions and servers?
             gatewayObserver.onSuccess();
-        } catch (JSONException ex) {
+        } catch (final JSONException ex) {
             gatewayObserver.onCallbackError(ex.getMessage());
         }
     }
@@ -368,15 +397,20 @@ public class JanusServer implements Runnable,
     //region AttachPluginCallbacks
 
     @Override
-    public void attachPluginSuccess(JSONObject obj, JanusSupportedPluginPackages plugin, IJanusPluginCallbacks pluginCallbacks) {
+    public void attachPluginSuccess(final JSONObject obj,
+    	final JanusSupportedPluginPackages plugin,
+    	final IJanusPluginCallbacks pluginCallbacks) {
+
         try {
-            BigInteger handle = new BigInteger(obj.getJSONObject("data").getString("id"));
-            JanusPluginHandle pluginHandle = new JanusPluginHandle(this, plugin, handle, pluginCallbacks);
+            final BigInteger handle
+            	= new BigInteger(obj.getJSONObject("data").getString("id"));
+            final JanusPluginHandle pluginHandle
+            	= new JanusPluginHandle(this, plugin, handle, pluginCallbacks);
             synchronized (attachedPluginsLock) {
                 attachedPlugins.put(handle, pluginHandle);
             }
             pluginCallbacks.success(pluginHandle);
-        } catch (JSONException ex) {
+        } catch (final JSONException ex) {
             //or do we want to use the pluginCallbacks.error(ex.getMessage());
             gatewayObserver.onCallbackError(ex.getMessage());
         }

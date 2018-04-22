@@ -19,15 +19,15 @@ public enum JanusSupportedPluginPackages {
         return plugin_name;
     }
 
-    private boolean EqualsString(String str) {
+    private boolean EqualsString(final String str) {
         return plugin_name.equals(str);
     }
 
-    private JanusSupportedPluginPackages(String plugin_name) {
+    private JanusSupportedPluginPackages(final String plugin_name) {
         this.plugin_name = plugin_name;
     }
 
-    public static JanusSupportedPluginPackages fromString(String string) {
+    public static JanusSupportedPluginPackages fromString(final String string) {
         if (JANUS_AUDIO_BRIDGE.EqualsString(string))
             return JANUS_AUDIO_BRIDGE;
         else if (JANUS_ECHO_TEST.EqualsString(string))

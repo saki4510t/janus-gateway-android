@@ -10,13 +10,13 @@ public interface IJanusMessenger {
 
     void disconnect();
 
-    void sendMessage(String message);
+    void sendMessage(final String message);
 
-    void sendMessage(String message, BigInteger session_id);
+    void sendMessage(final String message, final BigInteger session_id);
 
-    void sendMessage(String message, BigInteger session_id, BigInteger handle_id);
+    void sendMessage(final String message, final BigInteger session_id, final BigInteger handle_id);
 
-    void receivedMessage(String message);
+    void receivedMessage(final String message);
 
     JanusMessengerType getMessengerType();
 }

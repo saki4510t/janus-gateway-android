@@ -12,6 +12,7 @@ import com.koushikdutta.async.http.body.*;
 import com.koushikdutta.async.http.callback.HttpConnectCallback;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -21,6 +22,8 @@ import org.json.JSONObject;
 
 //TODO big todo...it would be good to use androidasync as we already utilize that for the websocket endpoint
 public class JanusRestMessenger implements IJanusMessenger {
+    private static final boolean DEBUG = true;	// set false on  production
+   	private static final String TAG = JanusRestMessenger.class.getSimpleName();
 
     private final IJanusMessageObserver handler;
     private final String uri;
@@ -29,13 +32,12 @@ public class JanusRestMessenger implements IJanusMessenger {
     private String resturi;
     private final JanusMessengerType type = JanusMessengerType.restful;
 
-    public void longPoll()
-    {
+    public void longPoll() {
         if(resturi.isEmpty())
             resturi = uri;
 
 
-        AsyncHttpGet get = new AsyncHttpGet(uri+"/"+session_id.toString()+"&maxev=1");
+        final AsyncHttpGet get = new AsyncHttpGet(uri+"/"+session_id.toString()+"&maxev=1");
 
         AsyncHttpClient.getDefaultInstance().executeJSONObject(get, new AsyncHttpClient.JSONObjectCallback() {
             @Override
@@ -48,7 +50,7 @@ public class JanusRestMessenger implements IJanusMessenger {
         });
     }
 
-    public JanusRestMessenger(String uri, IJanusMessageObserver handler) {
+    public JanusRestMessenger(final String uri, final IJanusMessageObserver handler) {
         this.handler = handler;
         this.uri = uri;
         resturi = "";
@@ -63,7 +65,7 @@ public class JanusRestMessenger implements IJanusMessenger {
     public void connect() {
          AsyncHttpClient.getDefaultInstance().execute(uri, new HttpConnectCallback() {
              @Override
-             public void onConnectCompleted(Exception ex, AsyncHttpResponse response) {
+             public void onConnectCompleted(final Exception ex, final AsyncHttpResponse response) {
                  if(ex==null)
                     handler.onOpen();
                  else
@@ -81,32 +83,35 @@ public class JanusRestMessenger implements IJanusMessenger {
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(final String message) {
         //todo
-        Log.d("message", "Sent: \n\t" + message);
-        if(resturi.isEmpty())
+        if (DEBUG) Log.d("message", "Sent: \n\t" + message);
+        if(resturi.isEmpty()) {
             resturi = uri;
-        AsyncHttpRequest request = new AsyncHttpRequest(Uri.parse(resturi),"post");
-       AsyncHttpPost post = new AsyncHttpPost(resturi);
+		}
+		final AsyncHttpRequest request = new AsyncHttpRequest(Uri.parse(resturi),"post");
+		final AsyncHttpPost post = new AsyncHttpPost(resturi);
 
         JSONObject obj = null;
         try {
             obj = new JSONObject(message);
         }
-        catch (Exception e)
-        {
-
+        catch (final Exception e) {
+			Log.w(TAG, e);
         }
 
         post.setBody(new JSONObjectBody(obj));
 
         AsyncHttpClient.getDefaultInstance().executeJSONObject(post, new AsyncHttpClient.JSONObjectCallback() {
             @Override
-            public void onCompleted(Exception e, AsyncHttpResponse source, JSONObject result) {
-               if(e==null)
-                receivedMessage(result.toString());
-                else
-                   handler.onError(e);
+            public void onCompleted(final Exception e,
+				final AsyncHttpResponse source, final JSONObject result) {
+
+				if (e == null) {
+					receivedMessage(result.toString());
+				} else {
+					handler.onError(e);
+				}
             }
         });
 
@@ -114,7 +119,7 @@ public class JanusRestMessenger implements IJanusMessenger {
     }
 
     @Override
-    public void sendMessage(String message, BigInteger session_id) {
+    public void sendMessage(final String message, final BigInteger session_id) {
         //todo
         this.session_id = session_id;
         resturi = "";
@@ -123,8 +128,10 @@ public class JanusRestMessenger implements IJanusMessenger {
     }
 
     @Override
-    public void sendMessage(String message, BigInteger session_id, BigInteger handle_id) {
-        //todo
+    public void sendMessage(final String message,
+    	final BigInteger session_id, final BigInteger handle_id) {
+
+        // todo
         this.session_id = session_id;
         this.handle_id = handle_id;
         resturi = "";
@@ -133,18 +140,18 @@ public class JanusRestMessenger implements IJanusMessenger {
     }
 
     //todo
-    private void handleNewMessage(String message) {
+    private void handleNewMessage(final String message) {
 
     }
 
     @Override
-    public void receivedMessage(String msg) {
+    public void receivedMessage(final String msg) {
 
         try {
             Log.d("message", "Recv: \n\t" + msg);
-            JSONObject obj = new JSONObject(msg);
+            final JSONObject obj = new JSONObject(msg);
             handler.receivedNewMessage(obj);
-        } catch (Exception ex) {
+        } catch (final JSONException ex) {
             handler.onError(ex);
         }
     }
