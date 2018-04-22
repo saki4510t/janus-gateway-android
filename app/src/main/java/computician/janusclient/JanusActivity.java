@@ -2,7 +2,6 @@ package computician.janusclient;
 
 import computician.janusclient.util.SystemUiHider;
 
-import android.app.Activity;
 import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -13,7 +12,7 @@ import android.view.WindowManager;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
 
-public class JanusActivity extends Activity {
+public class JanusActivity extends BaseActivity {
     private static final boolean AUTO_HIDE = true;
 
     /**
@@ -81,4 +80,14 @@ public class JanusActivity extends Activity {
         localRender = VideoRendererGui.create(72, 72, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, false);
         remoteRender = VideoRendererGui.create(0, 0, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, true);
     }
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (!checkPermissionNetwork()) return;
+		if (!checkPermissionAudio()) return;
+		if (!checkPermissionCamera()) return;
+
+	}
 }
