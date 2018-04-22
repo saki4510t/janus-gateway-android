@@ -16,7 +16,7 @@ public interface IJanusGatewayCallbacks extends IJanusCallbacks {
 
     public List<PeerConnection.IceServer> getIceServers();
 
-    public Boolean getIpv6Support();
+    public boolean getIpv6Support();
 
-    public Integer getMaxPollEvents();
+    public int getMaxPollEvents();
 }

@@ -64,13 +64,13 @@ public class EchoTest {
         }
 
         @Override
-        public Boolean getIpv6Support() {
+        public boolean getIpv6Support() {
             if (DEBUG) Log.v(TAG, "getIpv6Support:");
-            return Boolean.FALSE;
+            return false;
         }
 
         @Override
-        public Integer getMaxPollEvents() {
+        public int getMaxPollEvents() {
             if (DEBUG) Log.v(TAG, "getMaxPollEvents:");
             return 0;
         }
