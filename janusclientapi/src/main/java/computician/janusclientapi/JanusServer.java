@@ -14,11 +14,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.opengl.EGLContext;
 import android.os.AsyncTask;
+import android.util.Log;
 
 /**
  * Created by ben.trent on 5/7/2015.
  */
-public class JanusServer implements Runnable, IJanusMessageObserver, IJanusSessionCreationCallbacks, IJanusAttachPluginCallbacks {
+public class JanusServer implements Runnable,
+    IJanusMessageObserver, IJanusSessionCreationCallbacks,
+    IJanusAttachPluginCallbacks {
+
+    private static final boolean DEBUG = true;	// set false on  production
+   	private static final String TAG = JanusServer.class.getSimpleName();
 
     private class RandomString {
         final String str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -336,8 +342,9 @@ public class JanusServer implements Runnable, IJanusMessageObserver, IJanusSessi
     }
 
     @Override
-    public void onError(Exception ex) {
+    public void onError(final Exception ex) {
         gatewayObserver.onCallbackError("Error connected to Janus gateway. Exception: " + ex.getMessage());
+        Log.w(TAG, ex);
     }
     //endregion
 
