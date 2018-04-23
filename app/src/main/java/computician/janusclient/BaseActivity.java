@@ -1,12 +1,15 @@
 package computician.janusclient;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.serenegiant.dialog.MessageDialogFragment;
@@ -221,5 +224,15 @@ public abstract class BaseActivity extends Activity
 			return defaultValue;
 		}
 	}
-	
+
+//================================================================================
+	@TargetApi(19)
+	protected static int getSystemUiVisibility() {
+		int flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+		}
+		return flags;
+	}
+
 }
