@@ -1,7 +1,6 @@
 package computician.janusclient;
 
 import android.content.Context;
-import android.opengl.EGLContext;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -236,8 +235,11 @@ public class EchoTest {
         janusServer = new JanusServer(new JanusGlobalCallbacks());
     }
 
-    public boolean initializeMediaContext(Context context, boolean audio, boolean video, boolean videoHwAcceleration, EGLContext eglContext){
-        return janusServer.initializeMediaContext(context, audio, video, videoHwAcceleration, eglContext);
+	public boolean initializeMediaContext(final Context context,
+		final boolean audio,
+		final boolean video, final boolean videoHwAcceleration/*, EGLContext eglContext*/) {
+
+        return janusServer.initializeMediaContext(context, audio, video, videoHwAcceleration/*, eglContext*/);
     }
 
     public void Start() {

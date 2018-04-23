@@ -1,7 +1,6 @@
 package computician.janusclient;
 
 import android.content.Context;
-import android.opengl.EGLContext;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -408,8 +407,11 @@ public class VideoRoomTest {
 		}
 	}
 	
-	public boolean initializeMediaContext(Context context, boolean audio, boolean video, boolean videoHwAcceleration, EGLContext eglContext) {
-		return janusServer.initializeMediaContext(context, audio, video, videoHwAcceleration, eglContext);
+	public boolean initializeMediaContext(final Context context,
+		final boolean audio,
+		final boolean video, final boolean videoHwAcceleration/*, EGLContext eglContext*/) {
+
+		return janusServer.initializeMediaContext(context, audio, video, videoHwAcceleration/*, eglContext*/);
 	}
 	
 	public void Start() {
