@@ -26,7 +26,7 @@ public class JanusPluginHandle {
 	private MediaStream myStream = null;
 	private MediaStream remoteStream = null;
 	private SessionDescription mySdp = null;
-	private PeerConnection pc = null;
+	private PeerConnection mPeerConnection = null;
 	private DataChannel dataChannel = null;
 	@Nullable
 	private VideoCapturer videoCapturer;
@@ -122,7 +122,7 @@ public class JanusPluginHandle {
 				break;
 			case COMPLETE:
 				if (!trickle) {
-					mySdp = pc.getLocalDescription();
+					mySdp = mPeerConnection.getLocalDescription();
 					sendSdp(webRtcCallbacks);
 				} else {
 					sendTrickleCandidate(null);
@@ -175,7 +175,7 @@ public class JanusPluginHandle {
 		
 	}
 	
-	private PeerConnectionFactory sessionFactory = null;
+	private PeerConnectionFactory peerConnectionFactory = null;
 	private final JanusServer server;
 	public final JanusSupportedPluginPackages plugin;
 	public final BigInteger id;
@@ -204,13 +204,13 @@ public class JanusPluginHandle {
 		@Override
 		protected Void doInBackground(final IPluginHandleWebRTCCallbacks... params) {
 			final IPluginHandleWebRTCCallbacks webrtcCallbacks = params[0];
-			if (sessionFactory == null) {
+			if (peerConnectionFactory == null) {
 				webrtcCallbacks.onCallbackError("WebRtc PeerFactory is not initialized. Please call initializeMediaContext");
 				return null;
 			}
 			final JSONObject jsep = webrtcCallbacks.getJsep();
 			if (jsep != null) {
-				if (pc == null) {
+				if (mPeerConnection == null) {
 					if (DEBUG) Log.d(TAG,"could not set remote offer");
 					callbacks.onCallbackError("No peerconnection created, if this is an answer please use createAnswer");
 					return null;
@@ -221,7 +221,7 @@ public class JanusPluginHandle {
 					if (DEBUG) Log.d(TAG, sdpString);
 					SessionDescription.Type type = SessionDescription.Type.fromCanonicalForm(jsep.getString("type"));
 					SessionDescription sdp = new SessionDescription(type, sdpString);
-					pc.setRemoteDescription(new WebRtcObserver(webrtcCallbacks), sdp);
+					mPeerConnection.setRemoteDescription(new WebRtcObserver(webrtcCallbacks), sdp);
 				} catch (JSONException ex) {
 					if (DEBUG) Log.d(TAG, ex.getMessage());
 					webrtcCallbacks.onCallbackError(ex.getMessage());
@@ -239,7 +239,12 @@ public class JanusPluginHandle {
 		this.plugin = plugin;
 		id = handle_id;
 		this.callbacks = callbacks;
-		sessionFactory = new PeerConnectionFactory();
+		peerConnectionFactory = PeerConnectionFactory.builder()
+//			.setOptions(options)
+//			.setAudioDeviceModule(adm)
+//			.setVideoEncoderFactory(encoderFactory)
+//			.setVideoDecoderFactory(decoderFactory)
+			.createPeerConnectionFactory();
 	}
 	
 	public void onMessage(final String msg) {
@@ -290,9 +295,9 @@ public class JanusPluginHandle {
 			pc_cons.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
 		if (webRTCCallbacks.getMedia().getRecvVideo())
 			pc_cons.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
-		pc = sessionFactory.createPeerConnection(server.iceServers, pc_cons, new WebRtcObserver(webRTCCallbacks));
+		mPeerConnection = peerConnectionFactory.createPeerConnection(server.iceServers, pc_cons, new WebRtcObserver(webRTCCallbacks));
 		if (myStream != null)
-			pc.addStream(myStream);
+			mPeerConnection.addStream(myStream);
 		if (webRTCCallbacks.getJsep() == null) {
 			createSdpInternal(webRTCCallbacks, true);
 		} else {
@@ -302,7 +307,7 @@ public class JanusPluginHandle {
 				final SessionDescription.Type type
 					= SessionDescription.Type.fromCanonicalForm(obj.getString("type"));
 				final SessionDescription sessionDescription = new SessionDescription(type, sdp);
-				pc.setRemoteDescription(new WebRtcObserver(webRTCCallbacks), sessionDescription);
+				mPeerConnection.setRemoteDescription(new WebRtcObserver(webRTCCallbacks), sessionDescription);
 			} catch (final Exception ex) {
 				webRTCCallbacks.onCallbackError(ex.getMessage());
 			}
@@ -318,7 +323,7 @@ public class JanusPluginHandle {
 	}
 	
 	private void prepareWebRtc(final IPluginHandleWebRTCCallbacks callbacks) {
-		if (pc != null) {
+		if (mPeerConnection != null) {
 			if (callbacks.getJsep() == null) {
 				createSdpInternal(callbacks, true);
 			} else {
@@ -328,7 +333,7 @@ public class JanusPluginHandle {
 					final SessionDescription.Type type
 						= SessionDescription.Type.fromCanonicalForm(jsep.getString("type"));
 					final SessionDescription sdp = new SessionDescription(type, sdpString);
-					pc.setRemoteDescription(new WebRtcObserver(callbacks), sdp);
+					mPeerConnection.setRemoteDescription(new WebRtcObserver(callbacks), sdp);
 				} catch (JSONException ex) {
 				
 				}
@@ -339,8 +344,8 @@ public class JanusPluginHandle {
 			VideoTrack videoTrack = null;
 			MediaStream stream = null;
 			if (callbacks.getMedia().getSendAudio()) {
-				AudioSource source = sessionFactory.createAudioSource(new MediaConstraints());
-				audioTrack = sessionFactory.createAudioTrack(AUDIO_TRACK_ID, source);
+				AudioSource source = peerConnectionFactory.createAudioSource(new MediaConstraints());
+				audioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, source);
 			}
 			if (callbacks.getMedia().getSendVideo()) {
 				if (videoCapturer instanceof CameraVideoCapturer) {
@@ -364,11 +369,11 @@ public class JanusPluginHandle {
                 constraints.optional.add(new MediaConstraints.KeyValuePair("minWidth", Integer.toString(videoConstraints.getMinWidth())));
                 constraints.mandatory.add(new MediaConstraints.KeyValuePair("maxFrameRate", Integer.toString(videoConstraints.getMaxFramerate())));
                 constraints.optional.add(new MediaConstraints.KeyValuePair("minFrameRate", Integer.toString(videoConstraints.getMinFramerate()))); */
-				VideoSource source = sessionFactory.createVideoSource(videoCapturer/*, constraints*/);
-				videoTrack = sessionFactory.createVideoTrack(VIDEO_TRACK_ID, source);
+				VideoSource source = peerConnectionFactory.createVideoSource(videoCapturer/*, constraints*/);
+				videoTrack = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, source);
 			}
 			if (audioTrack != null || videoTrack != null) {
-				stream = sessionFactory.createLocalMediaStream(LOCAL_MEDIA_ID);
+				stream = peerConnectionFactory.createLocalMediaStream(LOCAL_MEDIA_ID);
 				if (audioTrack != null)
 					stream.addTrack(audioTrack);
 				if (videoTrack != null)
@@ -393,9 +398,9 @@ public class JanusPluginHandle {
 			if (DEBUG) Log.d(TAG, "Receiving video");
 		}
 		if (isOffer) {
-			pc.createOffer(new WebRtcObserver(callbacks), pc_cons);
+			mPeerConnection.createOffer(new WebRtcObserver(callbacks), pc_cons);
 		} else {
-			pc.createAnswer(new WebRtcObserver(callbacks), pc_cons);
+			mPeerConnection.createAnswer(new WebRtcObserver(callbacks), pc_cons);
 		}
 	}
 	
@@ -412,9 +417,9 @@ public class JanusPluginHandle {
 			myStream.dispose();
 			myStream = null;
 		}
-		if (pc != null && pc.signalingState() != PeerConnection.SignalingState.CLOSED)
-			pc.close();
-		pc = null;
+		if (mPeerConnection != null && mPeerConnection.signalingState() != PeerConnection.SignalingState.CLOSED)
+			mPeerConnection.close();
+		mPeerConnection = null;
 		started = false;
 		mySdp = null;
 		if (dataChannel != null)
@@ -434,10 +439,10 @@ public class JanusPluginHandle {
 	private void onLocalSdp(final SessionDescription sdp,
 		final IPluginHandleWebRTCCallbacks callbacks) {
 
-		if (pc != null) {
+		if (mPeerConnection != null) {
 			if (mySdp == null) {
 				mySdp = sdp;
-				pc.setLocalDescription(new WebRtcObserver(callbacks), sdp);
+				mPeerConnection.setLocalDescription(new WebRtcObserver(callbacks), sdp);
 			}
 			if (!iceDone && !trickle)
 				return;
@@ -476,7 +481,7 @@ public class JanusPluginHandle {
 	
 	private void sendSdp(final IPluginHandleWebRTCCallbacks callbacks) {
 		if (mySdp != null) {
-			mySdp = pc.getLocalDescription();
+			mySdp = mPeerConnection.getLocalDescription();
 			if (!sdpSent) {
 				sdpSent = true;
 				try {
