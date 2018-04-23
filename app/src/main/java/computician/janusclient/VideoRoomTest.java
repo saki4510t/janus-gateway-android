@@ -148,7 +148,7 @@ public class VideoRoomTest {
             }
         }
 
-        @Override
+		@Override
         public void onLocalStream(MediaStream stream) {
 			if (DEBUG) Log.v(TAG, "onLocalStream:" + stream);
         }
@@ -337,8 +337,8 @@ public class VideoRoomTest {
 
             }
         }
-
-        @Override
+	
+		@Override
         public void onLocalStream(final MediaStream stream) {
         	if (DEBUG) Log.v(TAG, "onLocalStream:" + stream);
             stream.videoTracks.get(0).addRenderer(new VideoRenderer(localRender));

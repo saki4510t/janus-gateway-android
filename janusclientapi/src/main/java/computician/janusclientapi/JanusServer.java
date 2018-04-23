@@ -121,11 +121,11 @@ public class JanusServer implements Runnable,
     	final boolean audio, final boolean video,
     	final boolean videoHwAcceleration, final EGLContext eglContext) {
 
-        if (!PeerConnectionFactory.initializeAndroidGlobals(context,
-        	audio, video, videoHwAcceleration, eglContext)) {
-
-            return false;
-		}
+//		if (!PeerConnectionFactory.initializeAndroidGlobals(context,
+//			audio, video, videoHwAcceleration, eglContext)) {
+//
+//			return false;
+//		}
         peerConnectionFactoryInitialized = true;
         return true;
     }

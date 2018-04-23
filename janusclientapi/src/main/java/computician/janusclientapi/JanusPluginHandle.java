@@ -9,6 +9,8 @@ import org.webrtc.*;
 
 import java.math.BigInteger;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by ben.trent on 6/25/2015.
  */
@@ -26,6 +28,8 @@ public class JanusPluginHandle {
 	private SessionDescription mySdp = null;
 	private PeerConnection pc = null;
 	private DataChannel dataChannel = null;
+	@Nullable
+	private VideoCapturer videoCapturer;
 	private boolean trickle = true;
 	private boolean iceDone = false;
 	private boolean sdpSent = false;
@@ -105,6 +109,11 @@ public class JanusPluginHandle {
 		}
 		
 		@Override
+		public void onIceConnectionReceivingChange(final boolean b) {
+		
+		}
+		
+		@Override
 		public void onIceGatheringChange(final PeerConnection.IceGatheringState state) {
 			switch (state) {
 			case NEW:
@@ -133,6 +142,11 @@ public class JanusPluginHandle {
 		}
 		
 		@Override
+		public void onIceCandidatesRemoved(final IceCandidate[] iceCandidates) {
+		
+		}
+		
+		@Override
 		public void onAddStream(final MediaStream stream) {
 			if (DEBUG) Log.d(TAG, "onAddStream " + stream.label());
 			remoteStream = stream;
@@ -152,6 +166,11 @@ public class JanusPluginHandle {
 		@Override
 		public void onRenegotiationNeeded() {
 			if (DEBUG) Log.d(TAG,"Renegotiation needed");
+		}
+		
+		@Override
+		public void onAddTrack(final RtpReceiver rtpReceiver, final MediaStream[] mediaStreams) {
+		
 		}
 		
 	}
@@ -324,15 +343,19 @@ public class JanusPluginHandle {
 				audioTrack = sessionFactory.createAudioTrack(AUDIO_TRACK_ID, source);
 			}
 			if (callbacks.getMedia().getSendVideo()) {
-				VideoCapturerAndroid capturer = null;
-				switch (callbacks.getMedia().getCamera()) {
-				case back:
-					capturer = VideoCapturerAndroid.create(VideoCapturerAndroid.getNameOfBackFacingDevice());
-					break;
-				case front:
-					capturer = VideoCapturerAndroid.create(VideoCapturerAndroid.getNameOfFrontFacingDevice());
-					break;
+				if (videoCapturer instanceof CameraVideoCapturer) {
+					Log.d(TAG, "Switch camera");
+					CameraVideoCapturer cameraVideoCapturer = (CameraVideoCapturer) videoCapturer;
+					cameraVideoCapturer.switchCamera(null);
 				}
+//				switch (callbacks.getMedia().getCamera()) {
+//				case back:
+//					capturer = VideoCapturerAndroid.create(VideoCapturerAndroid.getNameOfBackFacingDevice());
+//					break;
+//				case front:
+//					capturer = VideoCapturerAndroid.create(VideoCapturerAndroid.getNameOfFrontFacingDevice());
+//					break;
+//				}
 				final MediaConstraints constraints = new MediaConstraints();
 				JanusMediaConstraints.JanusVideo videoConstraints = callbacks.getMedia().getVideo();
                /* constraints.mandatory.add(new MediaConstraints.KeyValuePair("maxHeight", Integer.toString(videoConstraints.getMaxHeight())));
@@ -341,7 +364,7 @@ public class JanusPluginHandle {
                 constraints.optional.add(new MediaConstraints.KeyValuePair("minWidth", Integer.toString(videoConstraints.getMinWidth())));
                 constraints.mandatory.add(new MediaConstraints.KeyValuePair("maxFrameRate", Integer.toString(videoConstraints.getMaxFramerate())));
                 constraints.optional.add(new MediaConstraints.KeyValuePair("minFrameRate", Integer.toString(videoConstraints.getMinFramerate()))); */
-				VideoSource source = sessionFactory.createVideoSource(capturer, constraints);
+				VideoSource source = sessionFactory.createVideoSource(videoCapturer/*, constraints*/);
 				videoTrack = sessionFactory.createVideoTrack(VIDEO_TRACK_ID, source);
 			}
 			if (audioTrack != null || videoTrack != null) {

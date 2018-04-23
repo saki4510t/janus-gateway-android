@@ -116,14 +116,14 @@ public class JanusMediaConstraints {
         return recvAudio;
     }
 
-    public Camera getCamera() {
-        // FIXME should remove
-        return camera;
-    }
-
-    public void setCamera(final Camera camera) {
-        // FIXME should remove
-        this.camera = camera;
-    }
+//    public Camera getCamera() {
+//        // FIXME should remove
+//        return camera;
+//    }
+//
+//    public void setCamera(final Camera camera) {
+//        // FIXME should remove
+//        this.camera = camera;
+//    }
 
 }

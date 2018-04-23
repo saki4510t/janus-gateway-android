@@ -2,15 +2,10 @@ package computician.janusclient;
 
 import computician.janusclient.util.SystemUiHider;
 
-import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-
-import org.webrtc.VideoRenderer;
-import org.webrtc.VideoRendererGui;
 
 /**
  * Modified by t_saki t_saki@serenegiant.com on 2018
@@ -39,8 +34,55 @@ public class JanusActivity extends BaseActivity {
      */
     private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
 
-    private VideoRenderer.Callbacks localRender;
-    private VideoRenderer.Callbacks remoteRender;
+//	private static class ProxyRenderer implements VideoRenderer.Callbacks {
+//		private VideoRenderer.Callbacks target;
+//
+//		@Override
+//		public synchronized void renderFrame(final VideoRenderer.I420Frame frame) {
+//			if (target == null) {
+//				if (DEBUG) Log.d(TAG, "Dropping frame in proxy because target is null.");
+//				VideoRenderer.renderFrameDone(frame);
+//				return;
+//			}
+//
+//			target.renderFrame(frame);
+//		}
+//
+//		public synchronized void setTarget(final VideoRenderer.Callbacks target) {
+//			this.target = target;
+//		}
+//	}
+//
+//	private static class ProxyVideoSink implements VideoSink {
+//		private VideoSink target;
+//
+//		@Override
+//		public synchronized void onFrame(final VideoFrame frame) {
+//			if (target == null) {
+//       			if (DEBUG) Log.d(TAG, "Dropping frame in proxy because target is null.");
+//				return;
+//			}
+//
+//			target.onFrame(frame);
+//		}
+//
+//		public synchronized void setTarget(@Nullable final VideoSink target) {
+//			this.target = target;
+//		}
+//	}
+//
+//	private final ProxyRenderer remoteProxyRenderer = new ProxyRenderer();
+//	private final ProxyVideoSink localProxyVideoSink = new ProxyVideoSink();
+//	@Nullable
+//	private SurfaceViewRenderer pipRenderer;
+//	@Nullable
+//	private SurfaceViewRenderer fullscreenRenderer;
+//	@Nullable
+//	private VideoFileRenderer videoFileRenderer;
+//	private final List<VideoRenderer.Callbacks> remoteRenderers = new ArrayList<>();
+//
+//    private VideoRenderer.Callbacks localRender;
+//    private VideoRenderer.Callbacks remoteRender;
 
     /**
      * The instance of the {@link SystemUiHider} for this activity.
@@ -55,33 +97,33 @@ public class JanusActivity extends BaseActivity {
         }
 
         private void init() {
-            try {
-                final EGLContext con = VideoRendererGui.getEGLContext();
-                switch (TEST) {
-				case 0:
-				{
-					final EchoTest echoTest = new EchoTest(localRender, remoteRender);
-					echoTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
-					echoTest.Start();
-					break;
-				}
-				case 1:
-				{
-					final VideoRenderer.Callbacks[] renderers = new VideoRenderer.Callbacks[1];
-					renderers[0] = remoteRender;
-					final VideoRoomTest videoRoomTest = new VideoRoomTest(localRender, renderers);
-					videoRoomTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
-					videoRoomTest.Start();
-					break;
-				}
-				default:
-					throw new IllegalArgumentException("unsupported test index " + TEST);
-				
-				}
-
-            } catch (final Exception ex) {
-                Log.w(TAG, ex);
-            }
+//            try {
+//                final EGLContext con = VideoRendererGui.getEGLContext();
+//                switch (TEST) {
+//				case 0:
+//				{
+//					final EchoTest echoTest = new EchoTest(localRender, remoteRender);
+//					echoTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
+//					echoTest.Start();
+//					break;
+//				}
+//				case 1:
+//				{
+//					final VideoRenderer.Callbacks[] renderers = new VideoRenderer.Callbacks[1];
+//					renderers[0] = remoteRender;
+//					final VideoRoomTest videoRoomTest = new VideoRoomTest(localRender, renderers);
+//					videoRoomTest.initializeMediaContext(JanusActivity.this, true, true, true, con);
+//					videoRoomTest.Start();
+//					break;
+//				}
+//				default:
+//					throw new IllegalArgumentException("unsupported test index " + TEST);
+//
+//				}
+//
+//            } catch (final Exception ex) {
+//                Log.w(TAG, ex);
+//            }
         }
     }
 
@@ -96,10 +138,10 @@ public class JanusActivity extends BaseActivity {
 		final GLSurfaceView vsv = findViewById(R.id.glview);
         vsv.setPreserveEGLContextOnPause(true);
         vsv.setKeepScreenOn(true);
-        VideoRendererGui.setView(vsv, new MyInit());
-
-        localRender = VideoRendererGui.create(72, 72, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, false);
-        remoteRender = VideoRendererGui.create(0, 0, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, true);
+//        VideoRendererGui.setView(vsv, new MyInit());
+//
+//        localRender = VideoRendererGui.create(72, 72, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, false);
+//        remoteRender = VideoRendererGui.create(0, 0, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, true);
     }
 	
 	@Override
