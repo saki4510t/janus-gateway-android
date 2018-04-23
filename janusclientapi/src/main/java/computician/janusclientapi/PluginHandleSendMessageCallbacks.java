@@ -24,7 +24,7 @@ public class PluginHandleSendMessageCallbacks
     }
 
     @Override
-    public void onSuccesAsynchronous() {
+    public void onSuccessAsynchronous() {
     }
 
     @Override

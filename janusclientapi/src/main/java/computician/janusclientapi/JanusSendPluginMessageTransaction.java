@@ -38,7 +38,7 @@ public class JanusSendPluginMessageTransaction implements ITransactionCallbacks 
                     break;
                 }
                 case ack: {
-                    callbacks.onSuccesAsynchronous();
+                    callbacks.onSuccessAsynchronous();
                     break;
                 }
                 default: {
