@@ -1,6 +1,7 @@
 package computician.janusclient;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.appspot.apprtc.ProxyVideoSink;
@@ -21,8 +22,6 @@ import computician.janusclientapi.JanusServer;
 import computician.janusclientapi.JanusSupportedPluginPackages;
 import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 
-import static org.appspot.apprtc.Const.JANUS_URI;
-
 /**
  * Created by ben.trent on 7/24/2015.
  * Modified by t_saki t_saki@serenegiant.com on 2018
@@ -37,6 +36,8 @@ public class EchoTest {
 	private final ProxyVideoSink localRenderer;
     private final VideoRenderer.Callbacks remoteRender;
     private final JanusServer janusServer;
+    @NonNull
+    private final String serverUrl;
     private JanusPluginHandle handle = null;
 
     public class JanusGlobalCallbacks implements IJanusGatewayCallbacks {
@@ -55,7 +56,7 @@ public class EchoTest {
         @Override
         public String getServerUri() {
             if (DEBUG) Log.v(TAG, "getServerUri:");
-            return JANUS_URI;
+            return serverUrl;
         }
 
         @Override
@@ -231,9 +232,12 @@ public class EchoTest {
 
     }
 
-    public EchoTest(final ProxyVideoSink localRenderer,
+    public EchoTest(@NonNull final String serverUrl,
+    	 final ProxyVideoSink localRenderer,
         final VideoRenderer.Callbacks remoteRender) {
 
+		if (DEBUG) Log.v(TAG, "ctor:" + serverUrl);
+		this.serverUrl = serverUrl;
         this.localRenderer = localRenderer;
         this.remoteRender = remoteRender;
         janusServer = new JanusServer(localRenderer, new JanusGlobalCallbacks());

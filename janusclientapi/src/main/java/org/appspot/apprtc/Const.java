@@ -1,8 +1,6 @@
 package org.appspot.apprtc;
 
 public class Const {
-	public static final String JANUS_URI = "ws://192.168.1.26:8188";
-
 	// These constant fields below here came from AppRTCMobile app
 	public static final String EXTRA_ROOMID = "org.appspot.apprtc.ROOMID";
 	public static final String EXTRA_LOOPBACK = "org.appspot.apprtc.LOOPBACK";

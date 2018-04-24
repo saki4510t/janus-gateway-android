@@ -168,6 +168,7 @@ public class JanusActivity extends BaseActivity {
 		final Intent intent = getIntent();
 		final EglBase eglBase = EglBase.create();
 
+		final String serverUrl = intent.getData().toString();
 		// Create video renderers.
 		pipRenderer.init(eglBase.getEglBaseContext(), null);
 		pipRenderer.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
@@ -223,9 +224,9 @@ public class JanusActivity extends BaseActivity {
         	intent.getBooleanExtra(EXTRA_NEGOTIATED, false), intent.getIntExtra(EXTRA_ID, -1));
 		}
 		if (screenCaptureEnabled) {
-			startScreenCapture();
+			startScreenCapture(serverUrl);
 		} else {
-			startCall();
+			startCall(serverUrl);
 		}
     }
 	
@@ -260,7 +261,7 @@ public class JanusActivity extends BaseActivity {
 	}
 
 	@TargetApi(21)
-	private void startScreenCapture() {
+	private void startScreenCapture(final String serverUrl) {
 		final MediaProjectionManager mediaProjectionManager =
 			(MediaProjectionManager) getApplication().getSystemService(
 			Context.MEDIA_PROJECTION_SERVICE);
@@ -268,8 +269,10 @@ public class JanusActivity extends BaseActivity {
 			mediaProjectionManager.createScreenCaptureIntent(), CAPTURE_PERMISSION_REQUEST_CODE);
 	}
 
-	private void startCall() {
-		final VideoRoomTest videoRoomTest = new VideoRoomTest(localProxyVideoSink, remoteRenderers, null);
+	private void startCall(final String serverUrl) {
+		final VideoRoomTest videoRoomTest = new VideoRoomTest(
+			serverUrl,
+			localProxyVideoSink, remoteRenderers, null);
 		videoRoomTest.initializeMediaContext(JanusActivity.this,
 			true, true, true/*, con*/);
 		videoRoomTest.Start();

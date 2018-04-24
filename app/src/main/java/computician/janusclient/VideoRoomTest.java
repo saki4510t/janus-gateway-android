@@ -11,10 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
-import org.webrtc.VideoCapturer;
 import org.webrtc.VideoRenderer;
 
-import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -32,8 +30,6 @@ import computician.janusclientapi.JanusServer;
 import computician.janusclientapi.JanusSupportedPluginPackages;
 import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 import computician.janusclientapi.PluginHandleWebRTCCallbacks;
-
-import static org.appspot.apprtc.Const.JANUS_URI;
 
 //TODO create message classes unique to this plugin
 
@@ -54,16 +50,21 @@ public class VideoRoomTest {
 	private final Deque<VideoRenderer.Callbacks> availableRemoteRenderers = new ArrayDeque<>();
 	private final Map<BigInteger, VideoRenderer.Callbacks> remoteRenderers = new HashMap<>();
 	@NonNull
+	private final String serverUrl;
+	@NonNull
 	private final PeerConnectionParameters mParams;
 	private JanusPluginHandle handle = null;
 	private ProxyVideoSink localRenderer;
 	private JanusServer janusServer;
 	private BigInteger myid;
 	
-	public VideoRoomTest(final ProxyVideoSink localRenderer,
+	public VideoRoomTest(@NonNull final String serverUrl,
+		final ProxyVideoSink localRenderer,
 		final List<VideoRenderer.Callbacks> remoteRenders,
 		@NonNull final PeerConnectionParameters params) {
 		
+		if (DEBUG) Log.v(TAG, "ctor:" + serverUrl);
+		this.serverUrl = serverUrl;
 		this.localRenderer = localRenderer;
 		for (int i = 0; i < remoteRenders.size(); i++) {
 			this.availableRemoteRenderers.push(remoteRenders.get(i));
@@ -390,7 +391,7 @@ public class VideoRoomTest {
 		@Override
 		public String getServerUri() {
 			if (DEBUG) Log.v(TAG, "getServerUri:");
-			return JANUS_URI;
+			return serverUrl;
 		}
 		
 		@Override
