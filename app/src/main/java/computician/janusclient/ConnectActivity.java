@@ -37,7 +37,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
-import static computician.janusclient.Const.*;
+import static org.appspot.apprtc.Const.*;
 
 public class ConnectActivity extends BaseActivity {
 	private static final boolean DEBUG = true;    // XXX set false on production

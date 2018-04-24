@@ -1,6 +1,7 @@
 package computician.janusclientapi;
 
 import org.json.JSONObject;
+import org.webrtc.VideoCapturer;
 
 /**
  * Created by ben.trent on 6/25/2015.

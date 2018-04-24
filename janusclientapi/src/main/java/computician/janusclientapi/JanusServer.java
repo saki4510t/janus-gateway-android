@@ -6,14 +6,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.VideoSink;
 
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import android.opengl.EGLContext;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 /**
@@ -26,7 +27,7 @@ public class JanusServer implements Runnable,
     private static final boolean DEBUG = true;	// set false on  production
    	private static final String TAG = JanusServer.class.getSimpleName();
 
-    private class RandomString {
+    private static class RandomString {
         final String str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         final Random rnd = new Random();
 
@@ -39,49 +40,57 @@ public class JanusServer implements Runnable,
         }
     }
 
-    private final RandomString stringGenerator = new RandomString();
-    private final ConcurrentHashMap<BigInteger, JanusPluginHandle> attachedPlugins = new ConcurrentHashMap<BigInteger, JanusPluginHandle>();
-    private final Object attachedPluginsLock = new Object();
-    private final ConcurrentHashMap<String, ITransactionCallbacks> transactions = new ConcurrentHashMap<String, ITransactionCallbacks>();
-    private final Object transactionsLock = new Object();
-    public final String serverUri;
-    public final IJanusGatewayCallbacks gatewayObserver;
-    public final List<PeerConnection.IceServer> iceServers;
-    public final Boolean ipv6Support;
-    public final Integer maxPollEvents;
-    private BigInteger sessionId;
-    private Boolean connected;
-    private final IJanusMessenger serverConnection;
-    private volatile Thread keep_alive;
-    private Boolean peerConnectionFactoryInitialized = false;
-	
-	/**
-	 * FIXME This class should be static otherwise this will leak
-	 */
-    private class AsyncAttach extends AsyncTask<IJanusPluginCallbacks, Void ,Void> {
-        protected Void doInBackground(final IJanusPluginCallbacks... cbs){
+    private static class AsyncAttach extends AsyncTask<IJanusPluginCallbacks, Void ,Void> {
+        private final JanusServer mParent;
+        public AsyncAttach(@NonNull final JanusServer parent) {
+            mParent = parent;
+        }
+        
+        protected Void doInBackground(final IJanusPluginCallbacks... cbs) {
             final IJanusPluginCallbacks cb = cbs[0];
             try {
                 final JSONObject obj = new JSONObject();
                 obj.put("janus", JanusMessageType.attach);
                 obj.put("plugin", cb.getPlugin());
-                if (serverConnection.getMessengerType() == JanusMessengerType.websocket)
-                    obj.put("session_id", sessionId);
+                if (mParent.serverConnection.getMessengerType() == JanusMessengerType.websocket)
+                    obj.put("session_id", mParent.sessionId);
                 final ITransactionCallbacks tcb
                 	= JanusTransactionCallbackFactory
-                		.createNewTransactionCallback(JanusServer.this,
+                		.createNewTransactionCallback(mParent,
                 			TransactionType.attach, cb.getPlugin(), cb);
-                String transaction = putNewTransaction(tcb);
+                String transaction = mParent.putNewTransaction(tcb);
                 obj.put("transaction", transaction);
-                serverConnection.sendMessage(obj.toString(), sessionId);
-            } catch (JSONException ex) {
-                onCallbackError(ex.getMessage());
+                mParent.serverConnection.sendMessage(obj.toString(), mParent.sessionId);
+            } catch (final JSONException ex) {
+                mParent.onCallbackError(ex.getMessage());
             }
             return null;
-        };
+        }
     }
 
-    public JanusServer(IJanusGatewayCallbacks gatewayCallbacks) {
+	private final RandomString stringGenerator = new RandomString();
+	private final ConcurrentHashMap<BigInteger, JanusPluginHandle> attachedPlugins = new ConcurrentHashMap<BigInteger, JanusPluginHandle>();
+	private final Object attachedPluginsLock = new Object();
+	private final ConcurrentHashMap<String, ITransactionCallbacks> transactions = new ConcurrentHashMap<String, ITransactionCallbacks>();
+	private final Object transactionsLock = new Object();
+	public final String serverUri;
+	public final IJanusGatewayCallbacks gatewayObserver;
+	public final List<PeerConnection.IceServer> iceServers;
+	public final Boolean ipv6Support;
+	public final Integer maxPollEvents;
+	private BigInteger sessionId;
+	private Boolean connected;
+	private final IJanusMessenger serverConnection;
+	private volatile Thread keep_alive;
+	private Boolean peerConnectionFactoryInitialized = false;
+	private VideoSink localRender;
+
+	/**
+	 * Constructor
+	 * @param gatewayCallbacks
+	 */
+    public JanusServer(final VideoSink localRender, final IJanusGatewayCallbacks gatewayCallbacks) {
+    	this.localRender = localRender;
         gatewayObserver = gatewayCallbacks;
         serverUri = gatewayObserver.getServerUri();
         iceServers = gatewayObserver.getIceServers();
@@ -136,6 +145,7 @@ public class JanusServer implements Runnable,
         return true;
     }
 
+	@Override
     public void run() {
         while (keep_alive == Thread.currentThread()) {
             try {
@@ -171,10 +181,10 @@ public class JanusServer implements Runnable,
         if (!peerConnectionFactoryInitialized) {
             callbacks.onCallbackError("Peerconnection factory is not initialized," +
              	"please initialize via initializeMediaContext" +
-             	 "so that peerconnections can be made by the plugins");
+             	 "so that Peerconnection can be made by the plugins");
             return;
         }
-        new AsyncAttach().execute(callbacks);
+        new AsyncAttach(this).execute(callbacks);
     }
 
     public void destroy() {
@@ -411,7 +421,7 @@ public class JanusServer implements Runnable,
             final BigInteger handle
             	= new BigInteger(obj.getJSONObject("data").getString("id"));
             final JanusPluginHandle pluginHandle
-            	= new JanusPluginHandle(this, plugin, handle, pluginCallbacks);
+            	= new JanusPluginHandle(this, localRender, plugin, handle, pluginCallbacks);
             synchronized (attachedPluginsLock) {
                 attachedPlugins.put(handle, pluginHandle);
             }

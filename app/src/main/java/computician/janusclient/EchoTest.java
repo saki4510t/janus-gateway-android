@@ -3,6 +3,7 @@ package computician.janusclient;
 import android.content.Context;
 import android.util.Log;
 
+import org.appspot.apprtc.ProxyVideoSink;
 import org.json.JSONObject;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
@@ -20,7 +21,7 @@ import computician.janusclientapi.JanusServer;
 import computician.janusclientapi.JanusSupportedPluginPackages;
 import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 
-import static computician.janusclient.Const.JANUS_URI;
+import static org.appspot.apprtc.Const.JANUS_URI;
 
 /**
  * Created by ben.trent on 7/24/2015.
@@ -33,9 +34,10 @@ public class EchoTest {
     private static final boolean DEBUG = true;	// set false on  production
    	private static final String TAG = EchoTest.class.getSimpleName();
 
-    private JanusPluginHandle handle = null;
-    private final VideoRenderer.Callbacks localRender, remoteRender;
+	private final ProxyVideoSink localRenderer;
+    private final VideoRenderer.Callbacks remoteRender;
     private final JanusServer janusServer;
+    private JanusPluginHandle handle = null;
 
     public class JanusGlobalCallbacks implements IJanusGatewayCallbacks {
 
@@ -115,7 +117,7 @@ public class EchoTest {
                     return true;
                 }
 
-                @Override
+				@Override
                 public JanusMediaConstraints getMedia() {
                     if (DEBUG) Log.v(TAG, "getMedia:");
                     return new JanusMediaConstraints();
@@ -169,7 +171,7 @@ public class EchoTest {
                         return false;
                     }
 
-                    @Override
+					@Override
                     public void onCallbackError(String error) {
                         Log.w(TAG, error);
                     }
@@ -180,7 +182,7 @@ public class EchoTest {
 		@Override
         public void onLocalStream(final MediaStream stream) {
 			if (DEBUG) Log.v(TAG, "onLocalStream:" + stream);
-			stream.videoTracks.get(0).addRenderer(new VideoRenderer(localRender));
+			stream.videoTracks.get(0).addRenderer(new VideoRenderer(localRenderer));
 //			VideoRendererGui.update(localRender, 0, 0, 25, 25, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, false);
         }
 
@@ -229,10 +231,12 @@ public class EchoTest {
 
     }
 
-    public EchoTest(VideoRenderer.Callbacks localRender, VideoRenderer.Callbacks remoteRender) {
-        this.localRender = localRender;
+    public EchoTest(final ProxyVideoSink localRenderer,
+        final VideoRenderer.Callbacks remoteRender) {
+
+        this.localRenderer = localRenderer;
         this.remoteRender = remoteRender;
-        janusServer = new JanusServer(new JanusGlobalCallbacks());
+        janusServer = new JanusServer(localRenderer, new JanusGlobalCallbacks());
     }
 
 	public boolean initializeMediaContext(final Context context,

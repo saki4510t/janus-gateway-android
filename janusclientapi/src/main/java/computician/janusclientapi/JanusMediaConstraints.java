@@ -5,7 +5,7 @@ package computician.janusclientapi;
  */
 public class JanusMediaConstraints {
 
-    public class JanusVideo {
+    public static class JanusVideo {
         private int maxHeight, minHeight, maxWidth, minWidth, maxFramerate, minFramerate;
 
         public JanusVideo() {
@@ -84,7 +84,7 @@ public class JanusMediaConstraints {
         return video;
     }
 
-    public Boolean getSendVideo() {
+    public boolean getSendVideo() {
         return video != null;
     }
 

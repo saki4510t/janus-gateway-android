@@ -1,21 +1,27 @@
 package computician.janusclient;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.appspot.apprtc.PeerConnectionParameters;
+import org.appspot.apprtc.ProxyVideoSink;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
+import org.webrtc.VideoCapturer;
 import org.webrtc.VideoRenderer;
 
+import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import computician.janusclientapi.IJanusGatewayCallbacks;
 import computician.janusclientapi.IJanusPluginCallbacks;
@@ -27,7 +33,7 @@ import computician.janusclientapi.JanusSupportedPluginPackages;
 import computician.janusclientapi.PluginHandleSendMessageCallbacks;
 import computician.janusclientapi.PluginHandleWebRTCCallbacks;
 
-import static computician.janusclient.Const.JANUS_URI;
+import static org.appspot.apprtc.Const.JANUS_URI;
 
 //TODO create message classes unique to this plugin
 
@@ -45,21 +51,25 @@ public class VideoRoomTest {
 	private static final String user_name = "android";
 	private static final int roomid = 1234;
 	
+	private final Deque<VideoRenderer.Callbacks> availableRemoteRenderers = new ArrayDeque<>();
+	private final Map<BigInteger, VideoRenderer.Callbacks> remoteRenderers = new HashMap<>();
+	@NonNull
+	private final PeerConnectionParameters mParams;
 	private JanusPluginHandle handle = null;
-	private VideoRenderer.Callbacks localRender;
-	private Deque<VideoRenderer.Callbacks> availableRemoteRenderers = new ArrayDeque<>();
-	private HashMap<BigInteger, VideoRenderer.Callbacks> remoteRenderers = new HashMap<>();
+	private ProxyVideoSink localRenderer;
 	private JanusServer janusServer;
 	private BigInteger myid;
 	
-	public VideoRoomTest(final VideoRenderer.Callbacks localRender,
-		final VideoRenderer.Callbacks[] remoteRenders) {
+	public VideoRoomTest(final ProxyVideoSink localRenderer,
+		final List<VideoRenderer.Callbacks> remoteRenders,
+		@NonNull final PeerConnectionParameters params) {
 		
-		this.localRender = localRender;
-		for (int i = 0; i < remoteRenders.length; i++) {
-			this.availableRemoteRenderers.push(remoteRenders[i]);
+		this.localRenderer = localRenderer;
+		for (int i = 0; i < remoteRenders.size(); i++) {
+			this.availableRemoteRenderers.push(remoteRenders.get(i));
 		}
-		janusServer = new JanusServer(new JanusGlobalCallbacks());
+		this.mParams = params;
+		janusServer = new JanusServer(localRenderer, new JanusGlobalCallbacks());
 	}
 	
 	private class ListenerAttachCallbacks implements IJanusPluginCallbacks {
@@ -139,8 +149,8 @@ public class VideoRoomTest {
 						}
 					});
 				}
-			} catch (Exception ex) {
-			
+			} catch (final Exception ex) {
+				Log.w(TAG, ex);
 			}
 		}
 		
@@ -183,7 +193,7 @@ public class VideoRoomTest {
 		
 		@Override
 		public void onCallbackError(final String error) {
-			Log.v(TAG, "onCallbackError:" + error);
+			Log.w(TAG, "onCallbackError:" + error);
 		}
 	}
 	
@@ -228,8 +238,8 @@ public class VideoRoomTest {
 					}
 					
 					@Override
-					public void onCallbackError(String error) {
-					
+					public void onCallbackError(final String error) {
+						Log.w(TAG, "onCallbackError:" + error);
 					}
 				});
 			}
@@ -326,7 +336,7 @@ public class VideoRoomTest {
 		@Override
 		public void onLocalStream(final MediaStream stream) {
 			if (DEBUG) Log.v(TAG, "onLocalStream:" + stream);
-			stream.videoTracks.get(0).addRenderer(new VideoRenderer(localRender));
+			stream.videoTracks.get(0).addRenderer(new VideoRenderer(localRenderer));
 		}
 		
 		@Override
