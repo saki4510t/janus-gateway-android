@@ -98,7 +98,7 @@ public class JanusServer implements Runnable,
         maxPollEvents = gatewayObserver.getMaxPollEvents();
         connected = false;
         sessionId = new BigInteger("-1");
-        serverConnection = JanusMessagerFactory.createMessager(serverUri, this);
+        serverConnection = JanusMessengerFactory.createMessenger(serverUri, this);
     }
 
     private String putNewTransaction(ITransactionCallbacks transactionCallbacks) {
