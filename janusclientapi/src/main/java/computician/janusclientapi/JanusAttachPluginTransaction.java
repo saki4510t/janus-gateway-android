@@ -21,6 +21,7 @@ public class JanusAttachPluginTransaction implements ITransactionCallbacks {
         this.pluginCallbacks = pluginCallbacks;
     }
 
+    @Override
     public TransactionType getTransactionType() {
         return TransactionType.attach;
     }
